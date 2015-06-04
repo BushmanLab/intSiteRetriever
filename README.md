@@ -1,5 +1,8 @@
-# Get integration sites from Database
+# Get integration sites from Database or from Rdata files
+
 For a given sample name gets integration site and matched random controls(MRCs).
+
+
 
 # Interface
 
@@ -22,6 +25,6 @@ Functions:
 Run in the R console:
 
 ```bash
-library(testthat)
-test_dir(".")
+library(devtools)
+devtools::test()
 ```
