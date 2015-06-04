@@ -1,5 +1,3 @@
-source("random_site.R")
-
 context("Testing random positions generation.")
 
 reference <- get_reference_genome("hg18")
