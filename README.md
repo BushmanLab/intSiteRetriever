@@ -6,6 +6,26 @@ For a given sample name gets integration site and matched random controls(MRCs).
 
 # Interface
 
+At present we provide functions that work by loading data from database
+or from RData files produced by intSiteCaller.
+
+We need to create connection for both cases. 
+If we have RData files and sampleInfo.tsv connection can be established by:
+
+```r
+sites_final_path <- Sys.glob("../../data/*/sites.final.RData")
+sampleInfo_path <- "../../data/sampleInfo.tsv"
+
+connection <- create_connection_from_files(
+    sampleInfo_path, sites_final_path)
+```
+
+After connection is established we can get sites by:
+
+```r
+getUniqueSites(c("pool1-1", "clone1-1"), connection)
+```
+
 Functions:
 
 * getUniqueSites
