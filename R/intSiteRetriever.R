@@ -1,5 +1,3 @@
-source("sites_from_files.R")
-
 .connectToDB <- function(dbConn){
   if(is.null(dbConn)){
     library("RMySQL") #also loads DBI
