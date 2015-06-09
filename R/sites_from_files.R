@@ -23,6 +23,52 @@ get_unique_sites_from_files <- function(sampleNames, connection) {
     filter(connection$sites, sampleName %in% sampleNames)
 }
 
+get_sample_names_like_from_files <- function(sample_name_prefix, connection) {
+    known_sample_names <- unique((connection$sample_sex)$alias)
+    sample_name_regex <- gsub("%", "(.*)", sample_name_prefix)
+
+    matches <- .sample_name_prefix_match(known_sample_names, sample_name_regex)
+    matches <- gsub("(.*)", "%", matches, fixed=TRUE) # back to input format
+
+    replicates <- data.frame(sampleNames=known_sample_names,
+        originalNames=matches)
+    filter(replicates,  ! is.na(originalNames))
+}
+
+#' for a vector of sample names find matches to regex vector.
+#'
+#' @param sample_name vector of full sample names(replicates)
+#' @sample_prefix regex for sample prefixes
+#' @return vector of the same length as sample_name
+#' the value is either sample_prefix or NA if no hit is found.
+.sample_name_prefix_match <- function(sample_name, sample_prefix) {
+    sapply(sample_name, function(known_sample) {
+        .find_match(known_sample, sample_prefix)
+    }) 
+}
+
+
+#' for one sample and all possible prefixes find if
+#' there is a match
+.find_match <- function(sample, possible_prefix) {
+    stopifnot(length(sample) != 1)
+    matches <- sapply(possible_prefix, function(prefix) {
+        if(grepl(prefix, sample)) {
+            prefix
+        } else {
+            NA
+        }
+    })
+    match_index <- which( ! is.na(matches))
+    # replicate should only match one prefix
+    stopifnot(length(match_index) <= 1)
+    if (length(match_index) == 0) {
+        as.character(NA) # no hit
+    } else {
+        matches[match_index] # single hit
+    }
+}
+
 .read_sites <- function(sites_final_path) {
     do.call(rbind, lapply(sites_final_path, .get_sites_from_rdata))
 }
