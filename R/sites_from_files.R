@@ -6,6 +6,7 @@ library(dplyr)
 #' @param sampleInfo file path to sample information
 #' required columns are alias(synonym of setName, sampleNames) and gender
 #' @return connection (represented as a list)
+#' connection has: sites df, sample_sex df, sitesFromFiles members.
 #'
 #' @note list has member sitesFromFiles that is TRUE
 #' @note connection is used instead of DB connection
@@ -17,8 +18,9 @@ create_connection_from_files <- function(sampleInfo, sites_final_path) {
 }
 
 get_unique_sites_from_files <- function(sampleNames, connection) {
-    stopifnot(all(sampleNames %in% sites$sampleName))
-    filter(sites, sampleName %in% sampleNames)
+    stopifnot(connection$sitesFromFiles == TRUE)
+    stopifnot(all(sampleNames %in% (connection$sites)$sampleName))
+    filter(connection$sites, sampleName %in% sampleNames)
 }
 
 .read_sites <- function(sites_final_path) {
