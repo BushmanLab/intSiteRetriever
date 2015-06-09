@@ -136,6 +136,9 @@ setNameExists <- function(setName, conn=NULL){
 
 #only function that treats % as a wildcard rather than a literal
 getSampleNamesLike <- function(setName, conn=NULL){
+    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
+        return(get_sample_names_like_from_files(setName, conn))
+    }
   parsedSetNames <- paste0(gsub("%", "(.*)", paste0("^", setName, "$")), collapse="|")
 
   res <- .intSiteRetrieverQuery(paste0("SELECT DISTINCT sampleName
