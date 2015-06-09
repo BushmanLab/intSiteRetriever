@@ -44,6 +44,9 @@
 }
 
 getUniqueSites <- function(setName, conn=NULL){
+    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
+        return(get_unique_sites_from_files(setName, conn))
+    }
   .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
                                         sites.chr,
                                         sites.strand,
