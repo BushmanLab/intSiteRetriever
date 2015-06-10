@@ -24,6 +24,13 @@ test_that("file connection have sites element and confirmation", {
     expect_true("sites" %in% names(connection))
     expect_true("sitesFromFiles" %in% names(connection))
     expect_true("sample_sex" %in% names(connection))
+    expect_true("ref_genome" %in% names(connection))
+})
+
+test_that("sites element has 5 columns", {
+    expected <- c("siteID", "chr", "strand", "position", "sampleName")
+    actual <- names(connection$sites) 
+    expect_equal(length(setdiff(expected, actual)), 0)
 })
 
 test_that("can get sites that are present in files", {
@@ -37,7 +44,20 @@ test_that("can get sites that are present in different files", {
         c("pool1-1", "clone1-1", "clone4-3"), connection)), 4 + 1 + 2)
 })
 
-test_that("fail if sampleName is not found", {
-    expect_error(getUniqueSites(
-        c("pool1-1", "sample that does not exist"), connection))
+test_that("if sampleName is not found it is ignored", {
+    expect_equal(nrow(getUniqueSites(
+        c("pool1-1", "sample that does not exist"), connection)), 4
+    )
 })
+
+context("MRC sites")
+
+sample_names <- c("clone1-1", "HIV_CTRL_noLig-4", "UNIF")
+
+test_that("correct number of MRCs", {
+    expect_equal(
+        nrow(getUniqueSites(sample_names, connection)) * 3,
+        nrow(getMRCs(sample_names, conn=connection))
+    )
+})
+
