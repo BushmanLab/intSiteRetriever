@@ -127,6 +127,9 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
 }
 
 setNameExists <- function(setName, conn=NULL){
+    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
+        return(get_existing_sample_name_from_files(setName, conn))
+    }
   res <- .intSiteRetrieverQuery(paste0("SELECT DISTINCT sampleName
                                                     FROM samples
                                                     WHERE sampleName REGEXP ", .parseSetNames(setName), ";"), conn)

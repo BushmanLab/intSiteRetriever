@@ -8,11 +8,13 @@ library(dplyr)
 #' @return connection (represented as a list)
 #' connection has: sites df, sample_sex df, sitesFromFiles members.
 #'
+#' @stop if sample names from RData do not present in sampleInformation file
 #' @note list has member sitesFromFiles that is TRUE
 #' @note connection is used instead of DB connection
 create_connection_from_files <- function(sampleInfo, sites_final_path) {
     sample_sex <- .read_sampleInfo(sampleInfo)
     sites <- .read_sites(sites_final_path)
+    .check_rdata_sample_info_consistent(sample_sex, sites)
     connection <- list(sites=sites, sitesFromFiles=TRUE, sample_sex=sample_sex)
     connection
 }
@@ -33,6 +35,11 @@ get_sample_names_like_from_files <- function(sample_name_prefix, connection) {
     replicates <- data.frame(sampleNames=known_sample_names,
         originalNames=matches)
     filter(replicates,  ! is.na(originalNames))
+}
+
+get_existing_sample_name_from_files <- function(sample_names, connection) {
+    known_sample_names <- unique((connection$sample_sex)$alias)
+    sample_names %in% known_sample_names
 }
 
 #' for a vector of sample names find matches to regex vector.
@@ -106,4 +113,8 @@ get_sample_names_like_from_files <- function(sample_name_prefix, connection) {
 .check_sampleName_is_correct <- function(samples) {
     stopifnot( ! (is.null(samples)))
     stopifnot(length(samples) == length(unique(samples)))
+}
+
+.check_rdata_sample_info_consistent <- function(samples, sites) {
+    stopifnot(length(setdiff(sites$sampleName, samples$alias)) == 0)
 }

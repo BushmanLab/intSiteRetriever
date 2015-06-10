@@ -10,6 +10,11 @@ test_that("can create file connection, represented as a list", {
     expect_true(is.list(connection))
 })
 
+test_that("RData samples that are not in sampleInfo are invalid", {
+    sampleInfo_path_inconsistent <- "../../data/smaller_sampleInfo.tsv"
+    expect_error(create_connection_from_files(info, sampleInfo_path_inconsistent)) 
+})
+
 test_that("can not create file connection if files are not found", {
     expect_error(create_connection_from_files("this does not exist", sites_final_path))
     expect_error(create_connection_from_files(sampleInfo_path, c("this does not exist")))
