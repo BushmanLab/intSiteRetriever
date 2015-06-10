@@ -51,7 +51,7 @@ get_sample_names_like_from_files <- function(sample_name_prefix, connection) {
 #' for one sample and all possible prefixes find if
 #' there is a match
 .find_match <- function(sample, possible_prefix) {
-    stopifnot(length(sample) != 1)
+    stopifnot(length(sample) == 1)
     matches <- sapply(possible_prefix, function(prefix) {
         if(grepl(prefix, sample)) {
             prefix
