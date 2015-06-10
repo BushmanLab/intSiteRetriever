@@ -157,6 +157,9 @@ getSampleNamesLike <- function(setName, conn=NULL){
 }
 
 getRefGenome <- function(setName, conn=NULL){
+    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
+        return(get_ref_genome_from_files(setName, conn))
+    }
   .intSiteRetrieverQuery(paste0("SELECT samples.sampleName,
                                         samples.refGenome
                                  FROM samples

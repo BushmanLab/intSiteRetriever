@@ -4,6 +4,7 @@ library(dplyr)
 #'
 #' @param sites_final_path vector of file paths to sites.final.RData
 #' @param sampleInfo file path to sample information
+#' @param ref_genome at present the same genome is used for all the samples
 #' required columns are alias(synonym of setName, sampleNames) and gender
 #' @return connection (represented as a list)
 #' connection has: sites df, sample_sex df, sitesFromFiles members.
@@ -11,11 +12,12 @@ library(dplyr)
 #' @stop if sample names from RData do not present in sampleInformation file
 #' @note list has member sitesFromFiles that is TRUE
 #' @note connection is used instead of DB connection
-create_connection_from_files <- function(sampleInfo, sites_final_path) {
+create_connection_from_files <- function(sampleInfo, sites_final_path, ref_genome="hg18") {
     sample_sex <- .read_sampleInfo(sampleInfo)
     sites <- .read_sites(sites_final_path)
     .check_rdata_sample_info_consistent(sample_sex, sites)
-    connection <- list(sites=sites, sitesFromFiles=TRUE, sample_sex=sample_sex)
+    connection <- list(sites=sites, sitesFromFiles=TRUE, 
+        sample_sex=sample_sex, ref_genome=ref_genome)
     connection
 }
 
@@ -40,6 +42,14 @@ get_sample_names_like_from_files <- function(sample_name_prefix, connection) {
 get_existing_sample_name_from_files <- function(sample_names, connection) {
     known_sample_names <- unique((connection$sample_sex)$alias)
     sample_names %in% known_sample_names
+}
+
+get_ref_genome_from_files <- function(sample_names, connection) {
+    sample_exist <- get_existing_sample_name_from_files(
+        sample_names, connection)
+    ref_genomes <- rep(NA, length(sample_exist))
+    ref_genomes[sample_exist] <- connection$ref_genome
+    ref_genomes
 }
 
 #' for a vector of sample names find matches to regex vector.
