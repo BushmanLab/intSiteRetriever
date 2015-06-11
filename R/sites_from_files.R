@@ -55,10 +55,10 @@ get_ref_genome_from_files <- function(sample_names, connection) {
 
 get_sites_metadata_from_files <- function(sample_names, connection) {
     current_samples <- filter(connection$sites, sampleName %in% sample_names)
-    metadata <- select(current_samples, siteID, sampleName)
+    metadata <- dplyr::select(current_samples, siteID, sampleName)
     metadata$refGenome <- connection$ref_genome
     metadata <- merge(metadata, connection$sample_sex, by.x="sampleName", by.y="alias")
-    metadata <- select(metadata, siteID, refGenome, gender, sampleName)
+    metadata <- dplyr::select(metadata, siteID, refGenome, gender, sampleName)
     metadata
 }
 
