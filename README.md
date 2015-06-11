@@ -67,4 +67,7 @@ and from R terminal:
 ```
 devtools::document()
 devtools::install()
+library(intSiteRetriever)
 ```
+
+After that public API can be accessed.

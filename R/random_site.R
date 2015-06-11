@@ -12,6 +12,7 @@ library(dplyr)
 #'                      mm8, mm9 for mouse
 #' @note stop if cannot find unique genome from installed BSgenome
 #' @seealso getRefGenome
+#' @export
 get_reference_genome <- function(reference_genome) {
     pattern <- paste0("\\.", reference_genome, "$")
     match_index <- which(grepl(pattern, installed.genomes()))
@@ -33,6 +34,7 @@ get_reference_genome <- function(reference_genome) {
 #' @param number_of_positions total number of random positions to generate
 #' @param male_chr list of male-specific chromosomes prefixes(only 1 prefix is allowed at present)
 #' @return dataframe with columns: siteID, chr, strand, position
+#' @export
 get_random_positions <- function(siteIDs, reference_genome, gender,
                                  number_of_positions=3, male_chr=c("chrY")){
   stopifnot(length(male_chr) == 1)
