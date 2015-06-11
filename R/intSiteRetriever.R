@@ -60,21 +60,27 @@ getUniqueSites <- function(setName, conn=NULL){
 }
 
 getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
-  source("random_site.R")
-  sites.metadata <- .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
-                                                         samples.refGenome,
-                                                         samples.gender,
-                                                         samples.sampleName
-                                                  FROM sites, samples
-                                                  WHERE sites.sampleID = samples.sampleID
-                                                  AND samples.sampleName REGEXP ",
-                                                  .parseSetNames(setName),
-                                                  "AND sites.multihitClusterID IS NULL;"), conn)
+    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
+        sites.metadata <- get_sites_metadata_from_files(setName, conn)
+    } else { # from DB
+      sites.metadata <- .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
+                                                             samples.refGenome,
+                                                             samples.gender,
+                                                             samples.sampleName
+                                                      FROM sites, samples
+                                                      WHERE sites.sampleID = samples.sampleID
+                                                      AND samples.sampleName REGEXP ",
+                                                      .parseSetNames(setName),
+                                                      "AND sites.multihitClusterID IS NULL;"), conn)
+    }
 
   sites_meta <- data.frame("siteID"=sites.metadata$siteID,
                            "gender"=tolower(sites.metadata$gender))
+
+    stopifnot(length(unique(sites.metadata$refGenome)) == 1)
+    ref_genome <- sites.metadata$refGenome[1] # all the same
   
-  mrcs <- get_N_MRCs(sites_meta, get_reference_genome("hg18"), numberOfMRCs)
+  mrcs <- get_N_MRCs(sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
 
   #keep output consistant across functions
   mrcs$siteID <- as.numeric(levels(mrcs$siteID))[mrcs$siteID]

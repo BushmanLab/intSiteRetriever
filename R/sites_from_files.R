@@ -15,6 +15,7 @@ library(dplyr)
 create_connection_from_files <- function(sampleInfo, sites_final_path, ref_genome="hg18") {
     sample_sex <- .read_sampleInfo(sampleInfo)
     sites <- .read_sites(sites_final_path)
+    sites$siteID <- 1:nrow(sites)
     .check_rdata_sample_info_consistent(sample_sex, sites)
     connection <- list(sites=sites, sitesFromFiles=TRUE, 
         sample_sex=sample_sex, ref_genome=ref_genome)
@@ -23,7 +24,6 @@ create_connection_from_files <- function(sampleInfo, sites_final_path, ref_genom
 
 get_unique_sites_from_files <- function(sampleNames, connection) {
     stopifnot(connection$sitesFromFiles == TRUE)
-    stopifnot(all(sampleNames %in% (connection$sites)$sampleName))
     filter(connection$sites, sampleName %in% sampleNames)
 }
 
@@ -50,6 +50,15 @@ get_ref_genome_from_files <- function(sample_names, connection) {
     ref_genomes <- rep(NA, length(sample_exist))
     ref_genomes[sample_exist] <- connection$ref_genome
     ref_genomes
+}
+
+get_sites_metadata_from_files <- function(sample_names, connection) {
+    current_samples <- filter(connection$sites, sampleName %in% sample_names)
+    metadata <- select(current_samples, siteID, sampleName)
+    metadata$refGenome <- connection$ref_genome
+    metadata <- merge(metadata, connection$sample_sex, by.x="sampleName", by.y="alias")
+    metadata <- select(metadata, siteID, refGenome, gender, sampleName)
+    metadata
 }
 
 #' for a vector of sample names find matches to regex vector.
