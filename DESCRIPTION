@@ -1,9 +1,11 @@
 Package: intSiteRetriever
-Title: What the Package Does (one line, title case)
+Title: Integration sites from database or files.
 Version: 0.0.0.9000
 Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph)
-Depends: R (>= 3.2.0)
+Description: For integration sites produced by caller, provides ability to extract unique and multihit sites for further analysis.
+Depends: R (>= 3.1.0)
 License: What license is it under?
 LazyData: true
 Suggests: testthat
+Imports:
+    dplyr

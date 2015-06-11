@@ -43,6 +43,9 @@
   res
 }
 
+#' for a given sample names get sites.
+#' @param setName vector of sample names
+#' @export
 getUniqueSites <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
         return(get_unique_sites_from_files(setName, conn))
@@ -59,6 +62,11 @@ getUniqueSites <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NULL;"), conn)
 }
 
+#' creates match random controls.
+#' @param setName vector of sample names
+#' @param numberOfMRCs how many controls for each site
+#' @param conn connection: DB or File connection
+#' @export
 getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
         sites.metadata <- get_sites_metadata_from_files(setName, conn)
@@ -91,6 +99,11 @@ getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
   merge(mrcs, sites.metadata[c("siteID", "sampleName")])
 }
 
+#' multihits.
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getMultihitPositions <- function(setName, conn=NULL){
   .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
                                         sites.chr,
@@ -104,6 +117,11 @@ getMultihitPositions <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NOT NULL;"), conn)
 }
 
+#' lengths.
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getMultihitLengths <- function(setName, conn=NULL){
   .intSiteRetrieverQuery(paste0("SELECT DISTINCT multihitlengths.multihitClusterID,
                                                  multihitlengths.length,
@@ -116,6 +134,11 @@ getMultihitLengths <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NOT NULL;"), conn)
 }
 
+#' breakpoints.
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getUniquePCRbreaks <- function(setName, conn=NULL){
   .intSiteRetrieverQuery(paste0("SELECT pcrbreakpoints.breakpoint,
                                         pcrbreakpoints.count,
@@ -132,6 +155,10 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NULL;"), conn)
 }
 
+#' do we have sample names in db.
+#'
+#' @param conn connection: DB or File connection
+#' @export
 setNameExists <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
         return(get_existing_sample_name_from_files(setName, conn))
@@ -143,7 +170,11 @@ setNameExists <- function(setName, conn=NULL){
   setName %in% res$sampleName
 }
 
-#only function that treats % as a wildcard rather than a literal
+#' only function that treats % as a wildcard rather than a literal.
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getSampleNamesLike <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
         return(get_sample_names_like_from_files(setName, conn))
@@ -162,6 +193,11 @@ getSampleNamesLike <- function(setName, conn=NULL){
              "originalNames"=rep(setName, sapply(sampleNames, length)))
 }
 
+#' name of the reference genome used for site calling(e.g. hg 18).
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getRefGenome <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
         return(get_ref_genome_from_files(setName, conn))
@@ -172,6 +208,11 @@ getRefGenome <- function(setName, conn=NULL){
                                  WHERE samples.sampleName REGEXP ", .parseSetNames(setName), ";"), conn)
 }
 
+#' counts.
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getUniqueSiteReadCounts <- function(setName, conn=NULL){
   .intSiteRetrieverQuery(paste0("SELECT samples.sampleName,
                                         SUM(pcrbreakpoints.count) AS readCount
@@ -183,6 +224,11 @@ getUniqueSiteReadCounts <- function(setName, conn=NULL){
                                 GROUP BY sites.sampleID;"), conn)
 }
 
+#' unique counts.
+#'
+#' @param setName vector of sample names
+#' @param conn connection: DB or File connection
+#' @export
 getUniqueSiteCounts <- function(setName, conn=NULL){
   .intSiteRetrieverQuery(paste0("SELECT samples.sampleName,
                                         COUNT(*) AS uniqueSites

@@ -48,3 +48,26 @@ Run in the R console:
 library(devtools)
 devtools::test()
 ```
+
+# Installation
+
+From the R terminal run:
+```
+devtools::install_github("BushmanLab/intSiteRetriever")
+```
+
+If source is required, first get source from github, from bash:
+
+```
+git clone https://github.com/BushmanLab/intSiteRetriever.git
+```
+
+and from R terminal:
+
+```
+devtools::document()
+devtools::install()
+library(intSiteRetriever)
+```
+
+After that public API can be accessed.
