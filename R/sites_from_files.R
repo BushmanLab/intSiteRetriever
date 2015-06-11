@@ -9,9 +9,10 @@ library(dplyr)
 #' @return connection (represented as a list)
 #' connection has: sites df, sample_sex df, sitesFromFiles members.
 #'
-#' @stop if sample names from RData do not present in sampleInformation file
+#' @note stop if sample names from RData do not present in sampleInformation file
 #' @note list has member sitesFromFiles that is TRUE
 #' @note connection is used instead of DB connection
+#' @export
 create_connection_from_files <- function(sampleInfo, sites_final_path, ref_genome="hg18") {
     sample_sex <- .read_sampleInfo(sampleInfo)
     sites <- .read_sites(sites_final_path)
@@ -64,7 +65,7 @@ get_sites_metadata_from_files <- function(sample_names, connection) {
 #' for a vector of sample names find matches to regex vector.
 #'
 #' @param sample_name vector of full sample names(replicates)
-#' @sample_prefix regex for sample prefixes
+#' @param sample_prefix regex for sample prefixes
 #' @return vector of the same length as sample_name
 #' the value is either sample_prefix or NA if no hit is found.
 .sample_name_prefix_match <- function(sample_name, sample_prefix) {

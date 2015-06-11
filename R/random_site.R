@@ -6,11 +6,12 @@ library(dplyr)
 # gender is encoded as: 'm' or 'f'
 # @note length of chromosome is used as a weight
 
-#' return BS genome object for human readable UCSC format
+#' return BS genome OBJECT(not name) for human readable UCSC format
 #' 
 #' format examples are: hg18, hg19, hg38 for human
 #'                      mm8, mm9 for mouse
-#' @stop if cannot find unique genome from installed BSgenome
+#' @note stop if cannot find unique genome from installed BSgenome
+#' @seealso getRefGenome
 get_reference_genome <- function(reference_genome) {
     pattern <- paste0("\\.", reference_genome, "$")
     match_index <- which(grepl(pattern, installed.genomes()))
@@ -36,11 +37,11 @@ get_random_positions <- function(siteIDs, reference_genome, gender,
                                  number_of_positions=3, male_chr=c("chrY")){
   stopifnot(length(male_chr) == 1)
   stopifnot(length(gender) == 1)
-  stopifnot(check_gender(gender))
+  stopifnot(.check_gender(gender))
 
   chr_len <- seqlengths(reference_genome)
   stopifnot(any(grepl(male_chr, names(chr_len)))) # male chomosome is in genome
-  chr_len <- get_gender_specific_chr(chr_len, gender, male_chr)
+  chr_len <- .get_gender_specific_chr(chr_len, gender, male_chr)
   chr_len <- chr_len[names(chr_len) != "chrM"] #remove mitochondria
 
   cs <- c(0,cumsum(as.numeric(chr_len)))
@@ -81,7 +82,7 @@ get_random_positions <- function(siteIDs, reference_genome, gender,
 get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3) {
     stopifnot(setequal(names(sites_meta), c("siteID", "gender")))
     stopifnot(number_mrcs_per_site > 0)
-    stopifnot(check_gender(sites_meta$gender))
+    stopifnot(.check_gender(sites_meta$gender))
 
     num_sites <- nrow(sites_meta)
     tot_num_mrcs <- num_sites * number_mrcs_per_site
@@ -96,7 +97,7 @@ get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3) {
 
 #' from vector of chromosome lengths with names creates vector for male or female
 #' @param all_chromosomes vector with length, names(all_chromosomes) are actual names of chromosome
-get_gender_specific_chr <- function(all_chromosomes, gender, male_chr) {
+.get_gender_specific_chr <- function(all_chromosomes, gender, male_chr) {
     stopifnot( ! is.null(names(all_chromosomes)))
     stopifnot(length(male_chr) == 1)
     if (gender == 'm') {
@@ -109,7 +110,7 @@ get_gender_specific_chr <- function(all_chromosomes, gender, male_chr) {
 }
 
 #' gender can only be male('m') or female('f')
-check_gender <- function(gender) {
+.check_gender <- function(gender) {
     valid <- c('m', 'f')
     values <- unique(gender)
     all(values %in% valid)
