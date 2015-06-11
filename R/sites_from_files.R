@@ -50,7 +50,7 @@ get_ref_genome_from_files <- function(sample_names, connection) {
         sample_names, connection)
     ref_genomes <- rep(NA, length(sample_exist))
     ref_genomes[sample_exist] <- connection$ref_genome
-    ref_genomes
+    data.frame(sampleName=sample_names, refGenome=ref_genomes, stringsAsFactors=FALSE)
 }
 
 get_sites_metadata_from_files <- function(sample_names, connection) {
