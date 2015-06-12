@@ -99,7 +99,7 @@ getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
   merge(mrcs, sites.metadata[c("siteID", "sampleName")])
 }
 
-#' multihits.
+#' multihits
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
@@ -117,7 +117,7 @@ getMultihitPositions <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NOT NULL;"), conn)
 }
 
-#' lengths.
+#' lengths
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
@@ -134,7 +134,7 @@ getMultihitLengths <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NOT NULL;"), conn)
 }
 
-#' breakpoints.
+#' breakpoints
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
@@ -155,9 +155,10 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
                                 "AND sites.multihitClusterID IS NULL;"), conn)
 }
 
-#' do we have sample names in db.
+#' do we have sample names for a given connection
 #'
 #' @param conn connection: DB or File connection
+#' @return vector of TRUE/FALSE 
 #' @export
 setNameExists <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
@@ -170,10 +171,11 @@ setNameExists <- function(setName, conn=NULL){
   setName %in% res$sampleName
 }
 
-#' only function that treats % as a wildcard rather than a literal.
+#' find replicates
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
+#' @note only function that treats % as a wildcard rather than a literal
 #' @export
 getSampleNamesLike <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
@@ -193,10 +195,11 @@ getSampleNamesLike <- function(setName, conn=NULL){
              "originalNames"=rep(setName, sapply(sampleNames, length)))
 }
 
-#' name of the reference genome used for site calling(e.g. hg 18).
+#' name of the reference genome used
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
+#' return  df with 2 cols: sampleName and refGenome
 #' @export
 getRefGenome <- function(setName, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
@@ -208,7 +211,7 @@ getRefGenome <- function(setName, conn=NULL){
                                  WHERE samples.sampleName REGEXP ", .parseSetNames(setName), ";"), conn)
 }
 
-#' counts.
+#' counts
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
@@ -224,7 +227,7 @@ getUniqueSiteReadCounts <- function(setName, conn=NULL){
                                 GROUP BY sites.sampleID;"), conn)
 }
 
-#' unique counts.
+#' unique counts
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection

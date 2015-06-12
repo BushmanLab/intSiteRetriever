@@ -1,17 +1,19 @@
 library(dplyr)
 
-#' creates connection from RData files
+#' creates connection from RData files and sample information
 #'
 #' @param sites_final_path vector of file paths to sites.final.RData
-#' @param sampleInfo file path to sample information
-#' @param ref_genome at present the same genome is used for all the samples
-#' required columns are alias(synonym of setName, sampleNames) and gender
-#' @return connection (represented as a list)
-#' connection has: sites df, sample_sex df, sitesFromFiles members.
+#' @param sampleInfo file path to sample information(tab separated file)
+#' @param ref_genome name of genome, at present the same 
+#' genome is used for all the samples
 #'
-#' @note stop if sample names from RData do not present in sampleInformation file
+#' @return connection (represented as a list)
+#' connection has: sites df, sample_sex df, sitesFromFiles members
+#'
+#' @note stop if sample names from RData do not present in sample information file
 #' @note list has member sitesFromFiles that is TRUE
 #' @note connection is used instead of DB connection
+#' @note required columns are alias(synonym of setName, sampleNames) and gender
 #' @export
 create_connection_from_files <- function(sampleInfo, sites_final_path, ref_genome="hg18") {
     sample_sex <- .read_sampleInfo(sampleInfo)
@@ -50,15 +52,15 @@ get_ref_genome_from_files <- function(sample_names, connection) {
         sample_names, connection)
     ref_genomes <- rep(NA, length(sample_exist))
     ref_genomes[sample_exist] <- connection$ref_genome
-    ref_genomes
+    data.frame(sampleName=sample_names, refGenome=ref_genomes, stringsAsFactors=FALSE)
 }
 
 get_sites_metadata_from_files <- function(sample_names, connection) {
     current_samples <- filter(connection$sites, sampleName %in% sample_names)
-    metadata <- select(current_samples, siteID, sampleName)
+    metadata <- dplyr::select(current_samples, siteID, sampleName)
     metadata$refGenome <- connection$ref_genome
     metadata <- merge(metadata, connection$sample_sex, by.x="sampleName", by.y="alias")
-    metadata <- select(metadata, siteID, refGenome, gender, sampleName)
+    metadata <- dplyr::select(metadata, siteID, refGenome, gender, sampleName)
     metadata
 }
 
@@ -119,6 +121,8 @@ get_sites_metadata_from_files <- function(sample_names, connection) {
 #TODO: see also intSiteCaller read_sample_files.R
 .read_sampleInfo <- function(sampleInfo_file) {
     sample_sex <- read.delim(sampleInfo_file, stringsAsFactors=FALSE)
+    stopifnot("gender" %in% names(sample_sex))
+    stopifnot("alias" %in% names(sample_sex))
     .check_sex_is_correct(sample_sex$gender)
     .check_sampleName_is_correct(sample_sex$alias)
     sample_sex

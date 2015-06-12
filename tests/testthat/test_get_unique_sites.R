@@ -10,6 +10,13 @@ test_that("can create file connection, represented as a list", {
     expect_true(is.list(connection))
 })
 
+test_that("fails if cannot parse alias and gender", {
+    expect_error(create_connection_from_files(
+        "../../data/sampleInfo_csv_but_need_tsv.csv",
+        sites_final_path)
+    )
+})
+
 test_that("RData samples that are not in sampleInfo are invalid", {
     sampleInfo_path_inconsistent <- "../../data/smaller_sampleInfo.tsv"
     expect_error(create_connection_from_files(info, sampleInfo_path_inconsistent)) 
