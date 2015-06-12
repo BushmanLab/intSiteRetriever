@@ -1,5 +1,4 @@
 library(BSgenome)
-library(dplyr)
 
 # generate uniform random position on the reference genome
 # for all chromosomes(but  gender specific)
@@ -94,7 +93,7 @@ get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3) {
                            number_mrcs_per_site)
     })
 
-    unrowname(do.call(rbind, mrcs))
+    plyr::unrowname(do.call(rbind, mrcs))
 }
 
 #' from vector of chromosome lengths with names creates vector for male or female
