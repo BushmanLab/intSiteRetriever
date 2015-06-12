@@ -59,7 +59,7 @@ getUniqueSites <- function(setName, conn=NULL){
                                  WHERE sites.sampleID = samples.sampleID
                                  AND samples.sampleName REGEXP ",
                                  .parseSetNames(setName),
-                                "AND sites.multihitClusterID IS NULL;"), conn)
+                                ";"), conn)
 }
 
 #' creates match random controls.
@@ -79,7 +79,7 @@ getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
                                                       WHERE sites.sampleID = samples.sampleID
                                                       AND samples.sampleName REGEXP ",
                                                       .parseSetNames(setName),
-                                                      "AND sites.multihitClusterID IS NULL;"), conn)
+                                                      ";"), conn)
     }
 
   sites_meta <- data.frame("siteID"=sites.metadata$siteID,
@@ -105,7 +105,8 @@ getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
 #' @param conn connection: DB or File connection
 #' @export
 getMultihitPositions <- function(setName, conn=NULL){
-  .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
+    stop()
+    .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
                                         sites.chr,
                                         sites.strand,
                                         sites.position,
@@ -114,7 +115,7 @@ getMultihitPositions <- function(setName, conn=NULL){
                                  WHERE sites.sampleID = samples.sampleID
                                  AND samples.sampleName REGEXP ",
                                 .parseSetNames(setName),
-                                "AND sites.multihitClusterID IS NOT NULL;"), conn)
+                                ";"), conn)
 }
 
 #' lengths
@@ -123,6 +124,7 @@ getMultihitPositions <- function(setName, conn=NULL){
 #' @param conn connection: DB or File connection
 #' @export
 getMultihitLengths <- function(setName, conn=NULL){
+    stop()
   .intSiteRetrieverQuery(paste0("SELECT DISTINCT multihitlengths.multihitClusterID,
                                                  multihitlengths.length,
                                                  multihitlengths.count
@@ -152,7 +154,7 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
                                         pcrbreakpoints.siteID = sites.siteID)
                                  AND samples.sampleName REGEXP ",
                                  .parseSetNames(setName), 
-                                "AND sites.multihitClusterID IS NULL;"), conn)
+                                ";"), conn)
 }
 
 #' do we have sample names for a given connection
@@ -223,8 +225,7 @@ getUniqueSiteReadCounts <- function(setName, conn=NULL){
                                  WHERE (sites.sampleID = samples.sampleID AND
                                         pcrbreakpoints.siteID = sites.siteID)
                                  AND samples.sampleName REGEXP ", .parseSetNames(setName),
-                                "AND sites.multihitClusterID IS NULL
-                                GROUP BY sites.sampleID;"), conn)
+                                "GROUP BY sites.sampleID;"), conn)
 }
 
 #' unique counts
@@ -238,6 +239,5 @@ getUniqueSiteCounts <- function(setName, conn=NULL){
                                  FROM sites, samples
                                  WHERE sites.sampleID = samples.sampleID
                                  AND samples.sampleName REGEXP ", .parseSetNames(setName),
-                                "AND sites.multihitClusterID IS NULL
-                                 GROUP BY sites.sampleID;"), conn)
+                                "GROUP BY sites.sampleID;"), conn)
 }
