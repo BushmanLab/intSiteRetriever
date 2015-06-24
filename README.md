@@ -49,6 +49,9 @@ library(devtools)
 devtools::test()
 ```
 
+Database schema is from file `intsitesdev.sqlite`.
+
+
 # Installation
 
 From the R terminal run:

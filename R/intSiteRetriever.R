@@ -118,22 +118,31 @@ getMultihitPositions <- function(setName, conn=NULL){
                                 ";"), conn)
 }
 
-#' lengths
+#' from vector of sample names to sql string: ( sample, ..., sampleX )
+.sampleName_sql <- function(sampleName, conn) {
+    samples_sql <- dbQuoteString(conn, sampleName)
+    samples_sql <- paste(samples_sql, collapse=", ")
+    paste("(", samples_sql, ")")
+}
+
+#' lengths distributions for multihits
 #'
-#' @param setName vector of sample names
+#' @param sampleName vector of sample names
 #' @param conn connection: DB or File connection
+#' @return df with 3 cols: sampleName, multihitID, length
 #' @export
-getMultihitLengths <- function(setName, conn=NULL){
-    stop()
-  .intSiteRetrieverQuery(paste0("SELECT DISTINCT multihitlengths.multihitClusterID,
-                                                 multihitlengths.length,
-                                                 multihitlengths.count
-                                        FROM sites, samples, multihitlengths
-                                 WHERE multihitlengths.multihitClusterID = sites.multihitClusterID
-                                 AND sites.sampleID = samples.sampleID
-                                 AND samples.sampleName REGEXP ",
-                                .parseSetNames(setName),
-                                "AND sites.multihitClusterID IS NOT NULL;"), conn)
+getMultihitLengths <- function(sampleName, conn=NULL){
+    query <- paste( 
+        "SELECT DISTINCT samples.sampleName, 
+                multihitlengths.multihitID,
+                multihitlengths.length 
+        FROM samples, multihitpositions, multihitlengths
+        WHERE sampleName in ", 
+        .sampleName_sql(sampleName, conn), 
+        "AND samples.sampleID = multihitpositions.sampleID
+        AND multihitpositions.multihitID = multihitlengths.multihitID;"
+    )
+    dbGetQuery(conn, query)
 }
 
 #' breakpoints
