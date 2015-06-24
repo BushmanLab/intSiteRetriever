@@ -136,11 +136,13 @@ getMultihitLengths <- function(sampleName, conn=NULL){
         "SELECT DISTINCT samples.sampleName, 
                 multihitlengths.multihitID,
                 multihitlengths.length 
-        FROM samples, multihitpositions, multihitlengths
-        WHERE sampleName in ", 
+        FROM samples JOIN multihitpositions
+        ON samples.sampleID = multihitpositions.sampleID
+        JOIN multihitlengths
+        ON multihitpositions.multihitID = multihitlengths.multihitID ",
+        "WHERE sampleName in ", 
         .sampleName_sql(sampleName, conn), 
-        "AND samples.sampleID = multihitpositions.sampleID
-        AND multihitpositions.multihitID = multihitlengths.multihitID;"
+        ";"
     )
     dbGetQuery(conn, query)
 }
