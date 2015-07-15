@@ -76,3 +76,5 @@ library(intSiteRetriever)
 ```
 
 After that public API can be accessed.
+
+# continuous integration 
