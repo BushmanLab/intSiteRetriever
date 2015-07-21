@@ -41,6 +41,18 @@ Functions:
 * get_random_positions generate gender-specific positions for a genome
 * get_N_MRCs generate MRCs for sites that are not in DB
 
+#Depandencies
+
+
+Dependencies can be loaded with:
+
+```
+library(GenomicRanges)
+library(BSgenome)
+library(RMySQL)
+library(dplyr)
+```
+
 
 # Testing of the library components
 
