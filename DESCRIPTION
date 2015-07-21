@@ -6,6 +6,7 @@ Description: For integration sites produced by caller, provides ability to extra
 Depends: R (>= 3.1.0)
 License: What license is it under?
 LazyData: true
-Suggests: testthat
+Suggests: 
+    testthat, BSgenome
 Imports:
-    dplyr, plyr
+    dplyr, plyr, RMySQL

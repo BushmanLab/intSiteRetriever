@@ -1,6 +1,5 @@
 .connectToDB <- function(dbConn){
   if(is.null(dbConn)){
-    library("RMySQL") #also loads DBI
     all_cons <- dbListConnections(MySQL())
     for (con in all_cons) {
       discCon <- dbDisconnect(con)
