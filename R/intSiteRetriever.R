@@ -168,20 +168,37 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
                                 ";"), conn)
 }
 
+.check_has_sample_ref_cols <- function(sample_ref) {
+    return (all(c("sampleName", "refGenome") %in% names(sample_ref)))
+}
+
+.get_sample_ref_in_db <- function(sample_ref, conn) {
+    samples_in_db <- tbl(conn, "samples") 
+    samples_in_db <- select(samples_in_db, sampleName, refGenome)
+    collect(samples_in_db) 
+}
+
 #' do we have sample names for a given connection
 #'
+#' @param sample_ref: df with 2 cols: sampleName, refGenome
 #' @param conn connection: DB or File connection
 #' @return vector of TRUE/FALSE 
 #' @export
-setNameExists <- function(setName, conn=NULL){
-    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
-        return(get_existing_sample_name_from_files(setName, conn))
+setNameExists <- function(sample_ref, conn){
+    sample_ref
+    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
+        refGenome <- unique(sample_ref$refGenome)
+        stopifnot(length(refGenome) == 1) # file connection is for 1 genome at present
+        stopifnot(refGenome == conn$ref_genome)
+        return(get_existing_sample_name_from_files(sample_ref$sampleName, conn))
     }
-  res <- .intSiteRetrieverQuery(paste0("SELECT DISTINCT sampleName
-                                                    FROM samples
-                                                    WHERE sampleName REGEXP ", .parseSetNames(setName), ";"), conn)
-
-  setName %in% res$sampleName
+    stopifnot(.check_has_sample_ref_cols(sample_ref))
+    
+    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn) 
+    sample_ref_in_db$in_db <- TRUE # to distuinguish after merging
+    in_db <- merge(sample_ref, sample_ref_in_db, all.x=TRUE, sort=FALSE)$in_db
+    in_db[is.na(in_db)] <- FALSE
+    in_db
 }
 
 #' find replicates
