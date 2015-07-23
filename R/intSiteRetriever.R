@@ -195,6 +195,9 @@ setNameExists <- function(sample_ref, conn){
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     
     sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn) 
+    if (nrow(sample_ref_in_db) == 0) { # nothing is in db
+        return(rep(FALSE, nrow(sample_ref))) 
+    }
     sample_ref_in_db$in_db <- TRUE # to distuinguish after merging
     in_db <- merge(sample_ref, sample_ref_in_db, all.x=TRUE, sort=FALSE)$in_db
     in_db[is.na(in_db)] <- FALSE
