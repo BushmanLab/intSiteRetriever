@@ -172,10 +172,15 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
     return (all(c("sampleName", "refGenome") %in% names(sample_ref)))
 }
 
+.get_sample_table <- function(conn) {
+    samples_in_db <- tbl(conn, "samples") 
+    select(samples_in_db, sampleID, sampleName, refGenome)
+}
+
 .get_sample_ref_in_db <- function(sample_ref, conn) {
     samples_in_db <- tbl(conn, "samples") 
-    samples_in_db <- select(samples_in_db, sampleName, refGenome)
-    collect(samples_in_db) 
+    samples_in_db <- select(samples_in_db, sampleID, sampleName, refGenome)
+    inner_join(samples_in_db, sample_ref, by=c('sampleName', 'refGenome'), copy=TRUE)
 }
 
 #' do we have sample names for a given connection
@@ -184,7 +189,7 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
 #' @param conn connection: DB or File connection
 #' @return vector of TRUE/FALSE 
 #' @export
-setNameExists <- function(sample_ref, conn){
+setNameExists <- function(sample_ref, conn) {
     sample_ref
     if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
         refGenome <- unique(sample_ref$refGenome)
@@ -194,7 +199,7 @@ setNameExists <- function(sample_ref, conn){
     }
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     
-    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn) 
+    sample_ref_in_db <- collect(.get_sample_table(conn))
     if (nrow(sample_ref_in_db) == 0) { # nothing is in db
         return(rep(FALSE, nrow(sample_ref))) 
     }
@@ -259,16 +264,17 @@ getUniqueSiteReadCounts <- function(setName, conn=NULL){
                                 "GROUP BY sites.sampleID;"), conn)
 }
 
-#' unique counts
+#' unique counts for integration sites for a given sample(with fixed genome)
 #'
-#' @param setName vector of sample names
+#' @param sample_ref df with 2 cols: sampleName, refGenome
 #' @param conn connection: DB or File connection
 #' @export
-getUniqueSiteCounts <- function(setName, conn=NULL){
-  .intSiteRetrieverQuery(paste0("SELECT samples.sampleName,
-                                        COUNT(*) AS uniqueSites
-                                 FROM sites, samples
-                                 WHERE sites.sampleID = samples.sampleID
-                                 AND samples.sampleName REGEXP ", .parseSetNames(setName),
-                                "GROUP BY sites.sampleID;"), conn)
+getUniqueSiteCounts <- function(sample_ref, conn=NULL){
+    stopifnot(.check_has_sample_ref_cols(sample_ref))
+    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
+    sites <- tbl(conn, "sites") 
+
+    sample_ref_sites <- inner_join(sites, sample_ref_in_db)
+    sample_ref_sites_grouped <- group_by(sample_ref_sites, sampleName, refGenome)
+    collect(summarize(sample_ref_sites_grouped, uniqueSites=n()))
 }
