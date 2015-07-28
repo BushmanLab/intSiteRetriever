@@ -96,26 +96,27 @@ getMultihitPositions <- function(setName, conn=NULL){
     paste("(", samples_sql, ")")
 }
 
+.get_multihitpositions <- function(sample_ref, conn) {
+    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
+    multihitpositions <- tbl(conn, "multihitpositions") 
+    inner_join(multihitpositions, sample_ref_in_db, by="sampleID")
+}
+
 #' lengths distributions for multihits
 #'
 #' @param sampleName vector of sample names
 #' @param conn connection: DB or File connection
-#' @return df with 3 cols: sampleName, multihitID, length
+#' @return df with 3 cols: sampleName, refGenome, multihitID, length
 #' @export
-getMultihitLengths <- function(sampleName, conn=NULL){
-    query <- paste( 
-        "SELECT DISTINCT samples.sampleName, 
-                multihitlengths.multihitID,
-                multihitlengths.length 
-        FROM samples JOIN multihitpositions
-        ON samples.sampleID = multihitpositions.sampleID
-        JOIN multihitlengths
-        ON multihitpositions.multihitID = multihitlengths.multihitID ",
-        "WHERE sampleName in ", 
-        .sampleName_sql(sampleName, conn), 
-        ";"
-    )
-    dbGetQuery(conn, query)
+getMultihitLengths <- function(sample_ref, conn) {
+    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
+        stop("getMultihitLengths is not implemented for file connection.")
+    }
+    stopifnot(.check_has_sample_ref_cols(sample_ref))
+    samples_multihitpositions <- .get_multihitpositions(sample_ref, conn)
+    multihit_lengths <- tbl(conn, "multihitlengths")
+    collect(distinct(select(inner_join(samples_multihitpositions, multihit_lengths, by="multihitID"),
+        sampleName, refGenome, multihitID, length)))
 }
 
 .get_breakpoints <- function(sample_ref, conn) {
