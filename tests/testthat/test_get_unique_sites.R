@@ -40,20 +40,27 @@ test_that("sites element has 5 columns", {
     expect_equal(length(setdiff(expected, actual)), 0)
 })
 
+create_sample_ref <- function(sampleName) {
+    data_frame(
+        sampleName=sampleName,
+        refGenome=rep("hg18", length(sampleName))
+    )
+}
+
 test_that("can get sites that are present in files", {
-    expect_equal(nrow(getUniqueSites("pool1-1", connection)), 4)
+    expect_equal(nrow(getUniqueSites(create_sample_ref("pool1-1"), connection)), 4)
 })
 
 test_that("can get sites that are present in different files", {
     expect_equal(nrow(getUniqueSites(
-        c("pool1-1", "clone1-1"), connection)), 4 + 1)
+        create_sample_ref(c("pool1-1", "clone1-1")), connection)), 4 + 1)
     expect_equal(nrow(getUniqueSites(
-        c("pool1-1", "clone1-1", "clone4-3"), connection)), 4 + 1 + 2)
+        create_sample_ref(c("pool1-1", "clone1-1", "clone4-3")), connection)), 4 + 1 + 2)
 })
 
 test_that("if sampleName is not found it is ignored", {
     expect_equal(nrow(getUniqueSites(
-        c("pool1-1", "sample that does not exist"), connection)), 4
+        create_sample_ref(c("pool1-1", "sample that does not exist")), connection)), 4
     )
 })
 
@@ -63,7 +70,7 @@ sample_names <- c("clone1-1", "HIV_CTRL_noLig-4", "UNIF")
 
 test_that("correct number of MRCs", {
     expect_equal(
-        nrow(getUniqueSites(sample_names, connection)) * 3,
+        nrow(getUniqueSites(create_sample_ref(sample_names), connection)) * 3,
         nrow(getMRCs(sample_names, conn=connection))
     )
 })

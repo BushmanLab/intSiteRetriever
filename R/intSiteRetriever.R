@@ -9,23 +9,27 @@
     stop("obsolete")
 }
 
+.get_unique_sites <- function(sample_ref, conn) {
+    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
+    sites <- tbl(conn, "sites") 
+    inner_join(sites, sample_ref_in_db)
+}
+
 #' for a given sample names get sites.
 #' @param setName vector of sample names
 #' @export
-getUniqueSites <- function(setName, conn=NULL){
-    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
-        return(get_unique_sites_from_files(setName, conn))
+getUniqueSites <- function(sample_ref, conn){
+    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
+        refGenome <- unique(sample_ref$refGenome)
+        stopifnot(length(refGenome) == 1) # file connection is for 1 genome at present
+        stopifnot(refGenome == conn$ref_genome)
+        return(get_unique_sites_from_files(sample_ref$sampleName, conn))
     }
-  .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
-                                        sites.chr,
-                                        sites.strand,
-                                        sites.position,
-                                        samples.sampleName
-                                 FROM sites, samples
-                                 WHERE sites.sampleID = samples.sampleID
-                                 AND samples.sampleName REGEXP ",
-                                 .parseSetNames(setName),
-                                ";"), conn)
+    stopifnot(.check_has_sample_ref_cols(sample_ref))
+    sites <- .get_unique_sites(sample_ref, conn)
+    collect( select(sites, 
+        siteID, chr, strand, position, sampleName, refGenome)
+    )
 }
 
 #' creates match random controls.
@@ -114,25 +118,27 @@ getMultihitLengths <- function(sampleName, conn=NULL){
     dbGetQuery(conn, query)
 }
 
+.get_breakpoints <- function(sample_ref, conn) {
+    sample_ref_sites <- .get_unique_sites(sample_ref, conn)
+    breakpoints <- tbl(conn, "pcrbreakpoints") 
+    inner_join(sample_ref_sites, breakpoints) 
+}
+
 #' breakpoints
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
 #' @export
-getUniquePCRbreaks <- function(setName, conn=NULL){
-  .intSiteRetrieverQuery(paste0("SELECT pcrbreakpoints.breakpoint,
-                                        pcrbreakpoints.count,
-                                        sites.position AS integration,
-                                        sites.siteID,
-                                        sites.chr,
-                                        sites.strand,
-                                        samples.sampleName
-                                 FROM sites, samples, pcrbreakpoints
-                                 WHERE (sites.sampleID = samples.sampleID AND
-                                        pcrbreakpoints.siteID = sites.siteID)
-                                 AND samples.sampleName REGEXP ",
-                                 .parseSetNames(setName), 
-                                ";"), conn)
+getUniquePCRbreaks <- function(setName, conn) {
+    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
+        stop("getUniquePCRbreaks is not implemented for file connection.")
+    }
+    breakpoints <- .get_breakpoints(sample_ref, conn)
+    collect(select(breakpoints,
+        breakpoint, count, position, siteID, chr, strand, sampleName, refGenome)
+    )
+# column named kept as in DB
+#  .intSiteRetrieverQuery(paste0("...sites.position AS integration,
 }
 
 .check_has_sample_ref_cols <- function(sample_ref) {
@@ -157,7 +163,6 @@ getUniquePCRbreaks <- function(setName, conn=NULL){
 #' @return vector of TRUE/FALSE 
 #' @export
 setNameExists <- function(sample_ref, conn) {
-    sample_ref
     if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
         refGenome <- unique(sample_ref$refGenome)
         stopifnot(length(refGenome) == 1) # file connection is for 1 genome at present
@@ -216,11 +221,6 @@ getRefGenome <- function(setName, conn=NULL){
                                  WHERE samples.sampleName REGEXP ", .parseSetNames(setName), ";"), conn)
 }
 
-.get_unique_sites <- function(sample_ref, conn) {
-    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
-    sites <- tbl(conn, "sites") 
-    inner_join(sites, sample_ref_in_db)
-}
 
 #' counts
 #'
@@ -228,10 +228,11 @@ getRefGenome <- function(setName, conn=NULL){
 #' @param conn connection: DB or File connection
 #' @export
 getUniqueSiteReadCounts <- function(sample_ref, conn) {
+    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
+        stop("getUniqueSiteReadCounts does not implemented for file connection")
+    }
     stopifnot(.check_has_sample_ref_cols(sample_ref))
-    sample_ref_sites <- .get_unique_sites(sample_ref, conn)
-    breakpoints <- tbl(conn, "pcrbreakpoints") 
-    sample_ref_sites_breakpoints <- inner_join(sample_ref_sites, breakpoints) 
+    sample_ref_sites_breakpoints <- .get_breakpoints(sample_ref, conn) 
     sample_ref_sites_breakpoints_grouped <- group_by(
         sample_ref_sites_breakpoints, sampleName, refGenome)
     collect(summarize(sample_ref_sites_breakpoints_grouped, readCount=sum(count)))
