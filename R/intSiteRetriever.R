@@ -249,19 +249,25 @@ getRefGenome <- function(setName, conn=NULL){
                                  WHERE samples.sampleName REGEXP ", .parseSetNames(setName), ";"), conn)
 }
 
+.get_unique_sites <- function(sample_ref, conn) {
+    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
+    sites <- tbl(conn, "sites") 
+    inner_join(sites, sample_ref_in_db)
+}
+
 #' counts
 #'
 #' @param setName vector of sample names
 #' @param conn connection: DB or File connection
 #' @export
-getUniqueSiteReadCounts <- function(setName, conn=NULL){
-  .intSiteRetrieverQuery(paste0("SELECT samples.sampleName,
-                                        SUM(pcrbreakpoints.count) AS readCount
-                                 FROM sites, samples, pcrbreakpoints
-                                 WHERE (sites.sampleID = samples.sampleID AND
-                                        pcrbreakpoints.siteID = sites.siteID)
-                                 AND samples.sampleName REGEXP ", .parseSetNames(setName),
-                                "GROUP BY sites.sampleID;"), conn)
+getUniqueSiteReadCounts <- function(sample_ref, conn) {
+    stopifnot(.check_has_sample_ref_cols(sample_ref))
+    sample_ref_sites <- .get_unique_sites(sample_ref, conn)
+    breakpoints <- tbl(conn, "pcrbreakpoints") 
+    sample_ref_sites_breakpoints <- inner_join(sample_ref_sites, breakpoints) 
+    sample_ref_sites_breakpoints_grouped <- group_by(
+        sample_ref_sites_breakpoints, sampleName, refGenome)
+    collect(summarize(sample_ref_sites_breakpoints_grouped, readCount=sum(count)))
 }
 
 #' unique counts for integration sites for a given sample(with fixed genome)
@@ -269,12 +275,9 @@ getUniqueSiteReadCounts <- function(setName, conn=NULL){
 #' @param sample_ref df with 2 cols: sampleName, refGenome
 #' @param conn connection: DB or File connection
 #' @export
-getUniqueSiteCounts <- function(sample_ref, conn=NULL){
+getUniqueSiteCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
-    sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
-    sites <- tbl(conn, "sites") 
-
-    sample_ref_sites <- inner_join(sites, sample_ref_in_db)
+    sample_ref_sites <- .get_unique_sites(sample_ref, conn)
     sample_ref_sites_grouped <- group_by(sample_ref_sites, sampleName, refGenome)
     collect(summarize(sample_ref_sites_grouped, uniqueSites=n()))
 }

@@ -26,3 +26,5 @@ test_that("for samples in db with sites return counts", {
         2
     )
 })
+
+rm(read_conn)
