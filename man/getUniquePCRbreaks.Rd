@@ -4,7 +4,7 @@
 \alias{getUniquePCRbreaks}
 \title{breakpoints}
 \usage{
-getUniquePCRbreaks(setName, conn = NULL)
+getUniquePCRbreaks(setName, conn)
 }
 \arguments{
 \item{setName}{vector of sample names}
