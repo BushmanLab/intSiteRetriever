@@ -52,10 +52,10 @@ getMultihitLengths <- function(sample_ref, conn) {
 
 #' breakpoints
 #'
-#' @param setName vector of sample names
+#' @param sample_ref df with 2 cols: sampleName and refGenome
 #' @param conn connection: DB or File connection
 #' @export
-getUniquePCRbreaks <- function(setName, conn) {
+getUniquePCRbreaks <- function(sample_ref, conn) {
     if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
         stop("getUniquePCRbreaks is not implemented for file connection.")
     }
