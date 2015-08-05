@@ -1,5 +1,7 @@
 [![Travis-CI Build Status](https://travis-ci.org/BushmanLab/intSiteRetriever.svg?branch=master)](https://travis-ci.org/BushmanLab/intSiteRetriever)
 
+![codecov.io](http://codecov.io/github/BushmanLab/intSiteRetriever/branch.svg?branch=master)
+
 # Get integration sites from Database or from Rdata files
 
 For a given sample name gets integration site and matched random controls(MRCs).
