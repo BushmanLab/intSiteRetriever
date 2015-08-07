@@ -1,5 +1,3 @@
-library(dplyr)
-
 #' creates connection from RData files and sample information
 #'
 #' @param sites_final_path vector of file paths to sites.final.RData

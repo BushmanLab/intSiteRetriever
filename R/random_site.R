@@ -1,5 +1,3 @@
-library(BSgenome)
-
 # generate uniform random position on the reference genome
 # for all chromosomes(but  gender specific)
 # gender is encoded as: 'm' or 'f'
@@ -13,6 +11,10 @@ library(BSgenome)
 #' @seealso getRefGenome
 #' @export
 get_reference_genome <- function(reference_genome) {
+    if ( ! requireNamespace("BSgenome", quietly = TRUE)) {
+        stop("BSgenome needed for get_reference_genome function to work. Please install it.", 
+            call. = FALSE)
+    }
     pattern <- paste0("\\.", reference_genome, "$")
     match_index <- which(grepl(pattern, installed.genomes()))
     if (length(match_index) != 1) {
