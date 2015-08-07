@@ -9,4 +9,4 @@ LazyData: true
 Suggests: 
     testthat
 Imports:
-    dplyr, plyr, RMySQL, GenomicRanges, BSgenome
+    dplyr, plyr, BSgenome, RMySQL, GenomicRanges
