@@ -69,8 +69,9 @@ getUniqueSites <- function(setName, conn=NULL){
 getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
     if (is.list(conn) && conn$sitesFromFiles == TRUE) {
         sites.metadata <- get_sites_metadata_from_files(setName, conn)
+        sites.metadata
     } else { # from DB
-      sites.metadata <- .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
+        sites.metadata <- .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
                                                              samples.refGenome,
                                                              samples.gender,
                                                              samples.sampleName
@@ -81,21 +82,21 @@ getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
                                                       ";"), conn)
     }
 
-  sites_meta <- data.frame("siteID"=sites.metadata$siteID,
+    sites_meta <- data.frame("siteID"=sites.metadata$siteID,
                            "gender"=tolower(sites.metadata$gender))
 
     stopifnot(length(unique(sites.metadata$refGenome)) == 1)
     ref_genome <- sites.metadata$refGenome[1] # all the same
   
-  mrcs <- get_N_MRCs(sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
+    mrcs <- get_N_MRCs(sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
 
-  #keep output consistant across functions
-  mrcs$siteID <- as.numeric(levels(mrcs$siteID))[mrcs$siteID]
-  mrcs$position <- as.numeric(levels(mrcs$position))[mrcs$position]
-  mrcs$strand <- as.character(mrcs$strand)
-  mrcs$chr <- as.character(mrcs$chr)
+    #keep output consistant across functions
+    mrcs$siteID <- as.numeric(mrcs$siteID)
+    mrcs$position <- as.numeric(mrcs$position)
+    mrcs$strand <- as.character(mrcs$strand)
+    mrcs$chr <- as.character(mrcs$chr)
   
-  merge(mrcs, sites.metadata[c("siteID", "sampleName")])
+    merge(mrcs, sites.metadata[c("siteID", "sampleName")])
 }
 
 #' multihits
