@@ -7,6 +7,6 @@ Depends: R (>= 3.1.0)
 License: What license is it under?
 LazyData: true
 Suggests: 
-    testthat, BSgenome
+    testthat
 Imports:
     dplyr, plyr, RMySQL, GenomicRanges, BSgenome
