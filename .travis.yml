@@ -8,6 +8,10 @@ notifications:
     on_success: change
     on_failure: change
 
+bioc_packages:
+  - BSgenome
+  - GenomicRanges
+
 r_github_packages:
   - jimhester/covr
 after_success:
