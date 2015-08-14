@@ -31,7 +31,7 @@ get_reference_genome <- function(reference_genome) {
 #'
 #' @param siteIDs vector of unique siteIDs for use as random seed
 #' @param reference_genome BS object reference genome(@seealso get_reference_genome)
-#' @param gender 'm' or 'f
+#' @param gender 'm' or 'f'
 #' @param number_of_positions total number of random positions to generate
 #' @param male_chr list of male-specific chromosomes prefixes(only 1 prefix is allowed at present)
 #' @return dataframe with columns: siteID, chr, strand, position
@@ -82,7 +82,7 @@ get_random_positions <- function(siteIDs, reference_genome, gender,
 #' @return dataframe with columns: siteID, chr, strand, position
 #'
 #' @note siteID are the same as given by sites_meta df
-get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3) {
+get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3, male_chr="chrY") {
     stopifnot(setequal(names(sites_meta), c("siteID", "gender")))
     stopifnot(number_mrcs_per_site > 0)
     stopifnot(.check_gender(sites_meta$gender))
@@ -92,7 +92,7 @@ get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3) {
 
     mrcs <- lapply(split(sites_meta, sites_meta$gender), function(sites){
       get_random_positions(sites$siteID, reference_genome, sites[1,"gender"],
-                           number_mrcs_per_site)
+                           number_mrcs_per_site, male_chr)
     })
 
     plyr::unrowname(do.call(rbind, mrcs))
