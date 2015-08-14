@@ -1,7 +1,7 @@
 context("can get reference genome info")
 
-sites_final_path <- Sys.glob("../../data/*/sites.final.RData")
-sampleInfo_path <- "../../data/sampleInfo.tsv"
+sites_final_path <- Sys.glob("./data/*/sites.final.RData")
+sampleInfo_path <- "./data/sampleInfo.tsv"
 
 connection <- create_connection_from_files(
     sampleInfo_path, sites_final_path)

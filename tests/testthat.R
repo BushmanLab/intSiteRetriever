@@ -1,4 +1,10 @@
 library(testthat)
 library(intSiteRetriever)
+library(GenomeInfoDb)
+library(GenomicRanges)
+library(dplyr)
+library(RMySQL)
+library(BSgenome)
+library(BSgenome.Hsapiens.UCSC.hg18)
 
 test_check("intSiteRetriever")
