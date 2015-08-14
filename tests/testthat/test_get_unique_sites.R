@@ -62,6 +62,8 @@ context("MRC sites")
 sample_names <- c("clone1-1", "HIV_CTRL_noLig-4", "UNIF")
 
 test_that("correct number of MRCs", {
+    # we don't have human genome on travis becouse of memory restriction
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg18")
     expect_equal(
         nrow(getUniqueSites(sample_names, connection)) * 3,
         nrow(getMRCs(sample_names, conn=connection))
