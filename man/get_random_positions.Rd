@@ -12,7 +12,7 @@ get_random_positions(siteIDs, reference_genome, gender,
 
 \item{reference_genome}{BS object reference genome(}
 
-\item{gender}{'m' or 'f}
+\item{gender}{'m' or 'f'}
 
 \item{number_of_positions}{total number of random positions to generate}
 

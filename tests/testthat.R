@@ -5,6 +5,6 @@ library(GenomicRanges)
 library(dplyr)
 library(RMySQL)
 library(BSgenome)
-library(BSgenome.Hsapiens.UCSC.hg18)
+library(BSgenome.Scerevisiae.UCSC.sacCer2)
 
 test_check("intSiteRetriever")
