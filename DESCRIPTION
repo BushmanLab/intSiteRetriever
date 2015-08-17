@@ -7,6 +7,6 @@ Depends: R (>= 3.1.0)
 License: What license is it under?
 LazyData: true
 Suggests: 
-    testthat, BSgenome.Scerevisiae.UCSC.sacCer2
+    testthat, BSgenome.Scerevisiae.UCSC.sacCer2, RSQLite
 Imports:
     dplyr, plyr, BSgenome, RMySQL, GenomicRanges, GenomeInfoDb
