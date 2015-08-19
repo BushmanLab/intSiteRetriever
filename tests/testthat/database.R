@@ -1,4 +1,4 @@
-sql_schema <- "../../integration_site_schema.sql"
+sql_schema <- "integration_site_schema.sql"
 db_name <- "test_database"
 system(paste('sqlite3', db_name, '<', sql_schema))
 

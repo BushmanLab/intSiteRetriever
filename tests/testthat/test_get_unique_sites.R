@@ -1,7 +1,7 @@
 context("integration sites from files not DB")
 
-sites_final_path <- Sys.glob("../../data/*/sites.final.RData")
-sampleInfo_path <- "../../data/sampleInfo.tsv"
+sites_final_path <- Sys.glob("./data/*/sites.final.RData")
+sampleInfo_path <- "./data/sampleInfo.tsv"
 
 connection <- create_connection_from_files(
     sampleInfo_path, sites_final_path)
@@ -12,13 +12,13 @@ test_that("can create file connection, represented as a list", {
 
 test_that("fails if cannot parse alias and gender", {
     expect_error(create_connection_from_files(
-        "../../data/sampleInfo_csv_but_need_tsv.csv",
+        "./data/sampleInfo_csv_but_need_tsv.csv",
         sites_final_path)
     )
 })
 
 test_that("RData samples that are not in sampleInfo are invalid", {
-    sampleInfo_path_inconsistent <- "../../data/smaller_sampleInfo.tsv"
+    sampleInfo_path_inconsistent <- "./data/smaller_sampleInfo.tsv"
     expect_error(create_connection_from_files(info, sampleInfo_path_inconsistent)) 
 })
 
@@ -69,6 +69,8 @@ context("MRC sites")
 sample_names <- c("clone1-1", "HIV_CTRL_noLig-4", "UNIF")
 
 test_that("correct number of MRCs", {
+    # we don't have human genome on travis becouse of memory restriction
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg18")
     expect_equal(
         nrow(getUniqueSites(create_sample_ref(sample_names), connection)) * 3,
         nrow(getMRCs(sample_names, conn=connection))

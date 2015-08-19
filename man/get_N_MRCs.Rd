@@ -4,7 +4,8 @@
 \alias{get_N_MRCs}
 \title{generate random controls for sites}
 \usage{
-get_N_MRCs(sites_meta, reference_genome, number_mrcs_per_site = 3)
+get_N_MRCs(sites_meta, reference_genome, number_mrcs_per_site = 3,
+  male_chr = "chrY")
 }
 \arguments{
 \item{sites_meta}{dataframe with columns: siteID, gender}
