@@ -4,10 +4,12 @@
 \alias{setNameExists}
 \title{do we have sample names for a given connection}
 \usage{
-setNameExists(setName, conn = NULL)
+setNameExists(sample_ref, conn)
 }
 \arguments{
 \item{conn}{connection: DB or File connection}
+
+\item{sample_ref:}{df with 2 cols: sampleName, refGenome}
 }
 \value{
 vector of TRUE/FALSE

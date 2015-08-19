@@ -4,7 +4,7 @@
 \alias{getUniqueSites}
 \title{for a given sample names get sites.}
 \usage{
-getUniqueSites(setName, conn = NULL)
+getUniqueSites(sample_ref, conn)
 }
 \arguments{
 \item{setName}{vector of sample names}

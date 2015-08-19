@@ -4,15 +4,15 @@
 \alias{getMultihitLengths}
 \title{lengths distributions for multihits}
 \usage{
-getMultihitLengths(sampleName, conn = NULL)
+getMultihitLengths(sample_ref, conn)
 }
 \arguments{
-\item{sampleName}{vector of sample names}
-
 \item{conn}{connection: DB or File connection}
+
+\item{sampleName}{vector of sample names}
 }
 \value{
-df with 3 cols: sampleName, multihitID, length
+df with 3 cols: sampleName, refGenome, multihitID, length
 }
 \description{
 lengths distributions for multihits

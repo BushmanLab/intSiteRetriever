@@ -4,10 +4,10 @@
 \alias{getUniquePCRbreaks}
 \title{breakpoints}
 \usage{
-getUniquePCRbreaks(setName, conn = NULL)
+getUniquePCRbreaks(sample_ref, conn)
 }
 \arguments{
-\item{setName}{vector of sample names}
+\item{sample_ref}{df with 2 cols: sampleName and refGenome}
 
 \item{conn}{connection: DB or File connection}
 }

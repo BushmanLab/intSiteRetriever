@@ -2,16 +2,16 @@
 % Please edit documentation in R/intSiteRetriever.R
 \name{getUniqueSiteCounts}
 \alias{getUniqueSiteCounts}
-\title{unique counts}
+\title{unique counts for integration sites for a given sample(with fixed genome)}
 \usage{
-getUniqueSiteCounts(setName, conn = NULL)
+getUniqueSiteCounts(sample_ref, conn)
 }
 \arguments{
-\item{setName}{vector of sample names}
+\item{sample_ref}{df with 2 cols: sampleName, refGenome}
 
 \item{conn}{connection: DB or File connection}
 }
 \description{
-unique counts
+unique counts for integration sites for a given sample(with fixed genome)
 }
 

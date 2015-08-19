@@ -4,12 +4,12 @@
 \alias{getUniqueSiteReadCounts}
 \title{counts}
 \usage{
-getUniqueSiteReadCounts(setName, conn = NULL)
+getUniqueSiteReadCounts(sample_ref, conn)
 }
 \arguments{
-\item{setName}{vector of sample names}
-
 \item{conn}{connection: DB or File connection}
+
+\item{setName}{vector of sample names}
 }
 \description{
 counts
