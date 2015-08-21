@@ -64,16 +64,29 @@ test_that("if sampleName is not found it is ignored", {
     )
 })
 
-context("MRC sites")
+context("MRC sites from DB")
 
-sample_names <- c("clone1-1", "HIV_CTRL_noLig-4", "UNIF")
+source("database.R") # provide db_name
+db_conn <- src_sqlite(db_name)
+sample_ref <- data_frame(
+    sampleName=c("sample1", "sample2"),
+    refGenome=c("hg18", "hg18")
+)
 
 test_that("correct number of MRCs", {
     # we don't have human genome on travis becouse of memory restriction
     skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg18")
     expect_equal(
-        nrow(getUniqueSites(create_sample_ref(sample_names), connection)) * 3,
-        nrow(getMRCs(sample_names, conn=connection))
+        nrow(getUniqueSites(sample_ref, db_conn)) * 3,
+        nrow(getMRCs(sample_ref, db_conn))
     )
+})
+
+test_that("correct columns of MRCs", {
+    # we don't have human genome on travis becouse of memory restriction
+    skip_if_not_installed("BSgenome.Hsapiens.UCSC.hg18")
+    mrcs <- getMRCs(sample_ref, db_conn)
+    expect_named(mrcs, c("siteID", "position", "strand", "chr", "sampleName", "refGenome"),
+        ignore.order=TRUE)
 })
 

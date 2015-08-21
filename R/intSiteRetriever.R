@@ -77,7 +77,7 @@ getUniquePCRbreaks <- function(sample_ref, conn) {
 
 .get_sample_ref_in_db <- function(sample_ref, conn) {
     samples_in_db <- tbl(conn, "samples") 
-    samples_in_db <- select(samples_in_db, sampleID, sampleName, refGenome)
+    samples_in_db <- select(samples_in_db, sampleID, sampleName, refGenome, gender)
     inner_join(samples_in_db, sample_ref, by=c('sampleName', 'refGenome'), copy=TRUE)
 }
 
@@ -134,28 +134,24 @@ getUniqueSiteCounts <- function(sample_ref, conn) {
     collect(summarize(sample_ref_sites_grouped, uniqueSites=n()))
 }
 
-# TODO: functions below are not adjusted to PK as sampleName,refGenome
 
 #' creates match random controls.
-#' @param setName vector of sample names
-#' @param numberOfMRCs how many controls for each site
-#' @param conn connection: DB or File connection
 #'
-getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
-    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
+#' @param sampe_ref  df with 2 cols: sampleName, refGenome 
+#' @param numberOfMRCs how many controls for each site
+#' @param connection: DB or File connection
+#' @return df with cols: siteID, position, strand, chr, sampleName, refGenome
+#'
+getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
+    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
+        stop("getMRCs is not implemented for file connection")
         sites.metadata <- get_sites_metadata_from_files(setName, conn)
         sites.metadata
     } else { # from DB
-        stop("broken")
-        sites.metadata <- .intSiteRetrieverQuery(paste0("SELECT sites.siteID,
-                                                             samples.refGenome,
-                                                             samples.gender,
-                                                             samples.sampleName
-                                                      FROM sites, samples
-                                                      WHERE sites.sampleID = samples.sampleID
-                                                      AND samples.sampleName REGEXP ",
-                                                      .parseSetNames(setName),
-                                                      ";"), conn)
+        stopifnot(.check_has_sample_ref_cols(sample_ref))
+        sites <- .get_unique_sites(sample_ref, conn) 
+        sites.metadata <- collect(select(sites, 
+            siteID, gender, sampleName, refGenome))
     }
 
     sites_meta <- data.frame("siteID"=sites.metadata$siteID,
@@ -172,8 +168,10 @@ getMRCs <- function(setName, numberOfMRCs=3, conn=NULL){
     mrcs$strand <- as.character(mrcs$strand)
     mrcs$chr <- as.character(mrcs$chr)
   
-    merge(mrcs, sites.metadata[c("siteID", "sampleName")])
+    merge(mrcs, sites.metadata[c("siteID", "sampleName", "refGenome")])
 }
+
+# TODO: functions below are not adjusted to PK as sampleName,refGenome
 
 #' find replicates
 #'
