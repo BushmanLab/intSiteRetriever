@@ -141,6 +141,7 @@ getUniqueSiteCounts <- function(sample_ref, conn) {
 #' @param numberOfMRCs how many controls for each site
 #' @param connection: DB or File connection
 #' @return df with cols: siteID, position, strand, chr, sampleName, refGenome
+#' @export
 #'
 getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
     if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {

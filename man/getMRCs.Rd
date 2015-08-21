@@ -4,14 +4,17 @@
 \alias{getMRCs}
 \title{creates match random controls.}
 \usage{
-getMRCs(setName, numberOfMRCs = 3, conn = NULL)
+getMRCs(sample_ref, conn, numberOfMRCs = 3)
 }
 \arguments{
-\item{setName}{vector of sample names}
-
 \item{numberOfMRCs}{how many controls for each site}
 
-\item{conn}{connection: DB or File connection}
+\item{sampe_ref}{df with 2 cols: sampleName, refGenome}
+
+\item{connection:}{DB or File connection}
+}
+\value{
+df with cols: siteID, position, strand, chr, sampleName, refGenome
 }
 \description{
 creates match random controls.
