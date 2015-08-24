@@ -9,6 +9,13 @@ test_that("generate_random_positions returns df", {
         c("siteID", "chr", "position", "strand"), ignore.order=TRUE)
 })
 
+test_that("generate_random_positions returns df with correct types", {
+    # artificially assign one chromosome to gender
+    randoms <- get_random_positions(1, reference, 'm', male_chr="chrI")
+    types <- sapply(randoms, class)
+    expect_equivalent(types, c("numeric", "character", "character", "numeric"))
+})
+
 test_that("generate_random_positions only accepts male or female", {
     expect_error(get_random_positions(1, reference, 'xxx'))
     expect_error(get_random_positions(10, reference, 'A'))

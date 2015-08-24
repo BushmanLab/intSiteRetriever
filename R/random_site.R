@@ -34,7 +34,8 @@ get_reference_genome <- function(reference_genome) {
 #' @param gender 'm' or 'f'
 #' @param number_of_positions total number of random positions to generate
 #' @param male_chr list of male-specific chromosomes prefixes(only 1 prefix is allowed at present)
-#' @return dataframe with columns: siteID, chr, strand, position
+#' @return dataframe with columns: 
+#'      siteID(numeric), chr(character), strand(character), position(numeric)
 #' @export
 get_random_positions <- function(siteIDs, reference_genome, gender,
                                  number_of_positions=3, male_chr=c("chrY")){
@@ -52,26 +53,22 @@ get_random_positions <- function(siteIDs, reference_genome, gender,
 
   seed <- .Random.seed #don't want to screw up global randomness
 
-  mrcs <- sapply(siteIDs, function(x){
+  mrcs <- lapply(siteIDs, function(x){
     set.seed(x)
     rands <- round(runif(number_of_positions, 1, genomeLength*2)-genomeLength)
     cuts <- cut(abs(rands), breaks=cs, labels=names(chr_len))
 
     #outputs in format of "siteID", "chr", "strand", "position"
-    list(rep(x,number_of_positions),
-         as.character(cuts),
-         as.character(cut(sign(rands), breaks=c(-1,0,1), labels=c("-", "+"), include.lowest=T)),
-         abs(rands) - cs[match(cuts, names(chr_len))])
+    data_frame(
+        "siteID" = rep(x,number_of_positions),
+        "chr" = as.character(cuts),
+         "strand"=as.character(cut(sign(rands), breaks=c(-1,0,1), labels=c("-", "+"), include.lowest=T)),
+         "position"=abs(rands) - cs[match(cuts, names(chr_len))])
   })
 
   .Random.seed <- seed #resetting the seed
-
-  #this is ugly and requires as.character above but ~5X faster than outputting a list of
-  #data.frames and then rbinding them all together
-  mrcs <- data.frame(matrix(unlist(t(mrcs)), nrow=length(siteIDs)*number_of_positions))
-  names(mrcs) <- c("siteID", "chr", "strand", "position")
-
-  mrcs
+    
+  do.call(rbind, mrcs)
 }
 
 #' generate random controls for sites
