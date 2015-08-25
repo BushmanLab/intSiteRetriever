@@ -62,8 +62,8 @@ get_random_positions <- function(siteIDs, reference_genome, gender,
     data_frame(
         "siteID" = rep(x,number_of_positions),
         "chr" = as.character(cuts),
-         "strand"=as.character(cut(sign(rands), breaks=c(-1,0,1), labels=c("-", "+"), include.lowest=T)),
-         "position"=abs(rands) - cs[match(cuts, names(chr_len))])
+        "strand" = as.character(cut(sign(rands), breaks=c(-1,0,1), labels=c("-", "+"), include.lowest=T)),
+        "position" = abs(rands) - cs[match(cuts, names(chr_len))])
   })
 
   .Random.seed <- seed #resetting the seed

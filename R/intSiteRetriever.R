@@ -162,12 +162,6 @@ getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
     ref_genome <- sites.metadata$refGenome[1] # all the same
   
     mrcs <- get_N_MRCs(sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
-
-    #keep output consistant across functions
-    mrcs$siteID <- as.numeric(mrcs$siteID)
-    mrcs$position <- as.numeric(mrcs$position)
-    mrcs$strand <- as.character(mrcs$strand)
-    mrcs$chr <- as.character(mrcs$chr)
   
     merge(mrcs, sites.metadata[c("siteID", "sampleName", "refGenome")])
 }
