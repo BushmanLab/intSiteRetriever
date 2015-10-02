@@ -8,12 +8,6 @@
 #' @param setName vector of sample names
 #' @export
 getUniqueSites <- function(sample_ref, conn) {
-    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
-        refGenome <- unique(sample_ref$refGenome)
-        stopifnot(length(refGenome) == 1) # file connection is for 1 genome at present
-        stopifnot(refGenome == conn$ref_genome)
-        return(get_unique_sites_from_files(sample_ref$sampleName, conn))
-    }
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sites <- .get_unique_sites(sample_ref, conn)
     collect( select(sites, 
@@ -30,13 +24,10 @@ getUniqueSites <- function(sample_ref, conn) {
 #' lengths distributions for multihits
 #'
 #' @param sampleName vector of sample names
-#' @param conn connection: DB or File connection
+#' @param conn DB connection
 #' @return df with 3 cols: sampleName, refGenome, multihitID, length
 #' @export
 getMultihitLengths <- function(sample_ref, conn) {
-    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
-        stop("getMultihitLengths is not implemented for file connection.")
-    }
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     samples_multihitpositions <- .get_multihitpositions(sample_ref, conn)
     multihit_lengths <- tbl(conn, "multihitlengths")
@@ -53,12 +44,9 @@ getMultihitLengths <- function(sample_ref, conn) {
 #' breakpoints
 #'
 #' @param sample_ref df with 2 cols: sampleName and refGenome
-#' @param conn connection: DB or File connection
+#' @param conn DB connection
 #' @export
 getUniquePCRbreaks <- function(sample_ref, conn) {
-    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
-        stop("getUniquePCRbreaks is not implemented for file connection.")
-    }
     breakpoints <- .get_breakpoints(sample_ref, conn)
     collect(select(breakpoints,
         breakpoint, count, position, siteID, chr, strand, sampleName, refGenome)
@@ -84,37 +72,27 @@ getUniquePCRbreaks <- function(sample_ref, conn) {
 #' do we have sample names for a given connection
 #'
 #' @param sample_ref: df with 2 cols: sampleName, refGenome
-#' @param conn connection: DB or File connection
+#' @param conn DB connection
 #' @return vector of TRUE/FALSE 
 #' @export
 setNameExists <- function(sample_ref, conn) {
-    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
-        refGenome <- unique(sample_ref$refGenome)
-        stopifnot(length(refGenome) == 1) # file connection is for 1 genome at present
-        stopifnot(refGenome == conn$ref_genome)
-        return(get_existing_sample_name_from_files(sample_ref$sampleName, conn))
-    }
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     
     sample_ref_in_db <- collect(.get_sample_table(conn))
     if (nrow(sample_ref_in_db) == 0) { # nothing is in db
         return(rep(FALSE, nrow(sample_ref))) 
     }
-    sample_ref_in_db$in_db <- TRUE # to distuinguish after merging
-    in_db <- merge(sample_ref, sample_ref_in_db, all.x=TRUE, sort=FALSE)$in_db
-    in_db[is.na(in_db)] <- FALSE
-    in_db
+    ids <- paste0(sample_ref$sampleName, sample_ref$refGenome)
+    ids_DB <- paste0(sample_ref_in_db$sampleName, sample_ref_in_db$refGenome)
+    ids %in% ids_DB
 }
 
 #' counts
 #'
 #' @param setName vector of sample names
-#' @param conn connection: DB or File connection
+#' @param conn DB connection
 #' @export
 getUniqueSiteReadCounts <- function(sample_ref, conn) {
-    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
-        stop("getUniqueSiteReadCounts does not implemented for file connection")
-    }
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sample_ref_sites_breakpoints <- .get_breakpoints(sample_ref, conn) 
     sample_ref_sites_breakpoints_grouped <- group_by(
@@ -125,7 +103,7 @@ getUniqueSiteReadCounts <- function(sample_ref, conn) {
 #' unique counts for integration sites for a given sample(with fixed genome)
 #'
 #' @param sample_ref df with 2 cols: sampleName, refGenome
-#' @param conn connection: DB or File connection
+#' @param conn DB connection
 #' @export
 getUniqueSiteCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
@@ -139,21 +117,15 @@ getUniqueSiteCounts <- function(sample_ref, conn) {
 #'
 #' @param sampe_ref  df with 2 cols: sampleName, refGenome 
 #' @param numberOfMRCs how many controls for each site
-#' @param connection: DB or File connection
+#' @param DB connection
 #' @return df with cols: siteID, position, strand, chr, sampleName, refGenome
 #' @export
 #'
 getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
-    if (is.list(conn) && "sitesFromFiles" %in% names(conn) && conn$sitesFromFiles == TRUE) {
-        stop("getMRCs is not implemented for file connection")
-        sites.metadata <- get_sites_metadata_from_files(setName, conn)
-        sites.metadata
-    } else { # from DB
-        stopifnot(.check_has_sample_ref_cols(sample_ref))
-        sites <- .get_unique_sites(sample_ref, conn) 
-        sites.metadata <- collect(select(sites, 
-            siteID, gender, sampleName, refGenome))
-    }
+    stopifnot(.check_has_sample_ref_cols(sample_ref))
+    sites <- .get_unique_sites(sample_ref, conn) 
+    sites.metadata <- collect(select(sites, 
+        siteID, gender, sampleName, refGenome))
 
     sites_meta <- data.frame("siteID"=sites.metadata$siteID,
                            "gender"=tolower(sites.metadata$gender))
@@ -164,48 +136,4 @@ getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
     mrcs <- get_N_MRCs(sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
   
     merge(mrcs, sites.metadata[c("siteID", "sampleName", "refGenome")])
-}
-
-# TODO: functions below are not adjusted to PK as sampleName,refGenome
-
-#' find replicates
-#'
-#' @param setName vector of sample names
-#' @param conn connection: DB or File connection
-#' @note only function that treats % as a wildcard rather than a literal
-#'
-getSampleNamesLike <- function(setName, conn=NULL){
-    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
-        return(get_sample_names_like_from_files(setName, conn))
-    }
-    stop("broken")
-  parsedSetNames <- paste0(gsub("%", "(.*)", paste0("^", setName, "$")), collapse="|")
-
-  res <- .intSiteRetrieverQuery(paste0("SELECT DISTINCT sampleName
-                                                    FROM samples
-                                                    WHERE sampleName REGEXP ", .quoteForMySQL(parsedSetNames), ";"), conn)
-
-  sampleNames <- lapply(strsplit(parsedSetNames, "\\|")[[1]], function(x){
-    res$sampleName[grepl(x, res$sampleName)]
-  })
-
-  data.frame("sampleNames"=unlist(sampleNames, use.names=F),
-             "originalNames"=rep(setName, sapply(sampleNames, length)))
-}
-
-#' name of the reference genome used
-#'
-#' @param setName vector of sample names
-#' @param conn connection: DB or File connection
-#' return  df with 2 cols: sampleName and refGenome
-#'
-getRefGenome <- function(setName, conn=NULL){
-    if (is.list(conn) && conn$sitesFromFiles == TRUE) {
-        return(get_ref_genome_from_files(setName, conn))
-    }
-    stop("broken")
-  .intSiteRetrieverQuery(paste0("SELECT samples.sampleName,
-                                        samples.refGenome
-                                 FROM samples
-                                 WHERE samples.sampleName REGEXP ", .parseSetNames(setName), ";"), conn)
 }
