@@ -79,6 +79,7 @@ get_random_positions <- function(siteIDs, reference_genome, gender,
 #' @return dataframe with columns: siteID, chr, strand, position
 #'
 #' @note siteID are the same as given by sites_meta df
+#' @export
 get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3, male_chr="chrY") {
     stopifnot(setequal(names(sites_meta), c("siteID", "gender")))
     stopifnot(number_mrcs_per_site > 0)
