@@ -1,22 +1,14 @@
-context("check if sites for samples exists in files")
+context("check if sites for samples exists")
+source("database.R") # provide db_name
 
-sites_final_path <- Sys.glob("./data/*/sites.final.RData")
-sampleInfo_path <- "./data/sampleInfo.tsv"
+read_conn <- src_sqlite(db_name)
 
-connection <- create_connection_from_files(
-    sampleInfo_path, sites_final_path)
-
-sample_names_existing <- c("pool2-4", "HIV_CTRL_noLig-1", "clone2-3")
-sample_names_non_existing <- c("pool42", "beVeryDRY", "SOLID")
-sample_names <- c(sample_names_existing, sample_names_non_existing)
-sample_ref <- data_frame(sampleName=sample_names, 
-    refGenome=rep("hg18", length(sample_names))
+sample_ref <- data_frame(
+    sampleName=c("sample1", "sample2", "NOT_THERE", "sample2", "sample3"),
+    refGenome=c("hg18", "hg18", "UNKNOWN_GENOME", "hgXXX", "hgYYY")
 )
 
-test_that("check that samples from sampleInfo file are in", {
-    is_exist <- setNameExists(sample_ref, connection)
-    expect_equal(is_exist, c(
-        rep(TRUE, length(sample_names_existing)),
-        rep(FALSE, length(sample_names_non_existing))
-    ))
+test_that("check that samples are in", {
+    is_exist <- setNameExists(sample_ref, read_conn)
+    expect_equal(is_exist, c(TRUE, TRUE, FALSE, TRUE, TRUE))
 })

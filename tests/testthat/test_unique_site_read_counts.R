@@ -2,7 +2,7 @@ source("database.R") # provide db_name
 
 read_conn <- src_sqlite(db_name)
 
-context("Unique sites Read counts from DB")
+context("Unique sites Read counts")
 
 sample_ref <- data_frame(
     sampleName=c("sample1", "sample2", "sample2", "sample3"),
