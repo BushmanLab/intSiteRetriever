@@ -7,9 +7,9 @@
 getUniquePCRbreaks(sample_ref, conn)
 }
 \arguments{
-\item{sample_ref}{df with 2 cols: sampleName and refGenome}
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
 
-\item{conn}{DB connection}
+\item{conn}{connection to database}
 }
 \description{
 breakpoints

@@ -7,11 +7,11 @@
 getMRCs(sample_ref, conn, numberOfMRCs = 3)
 }
 \arguments{
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
+
+\item{conn}{connection to database}
+
 \item{numberOfMRCs}{how many controls for each site}
-
-\item{sampe_ref}{df with 2 cols: sampleName, refGenome}
-
-\item{DB}{connection}
 }
 \value{
 df with cols: siteID, position, strand, chr, sampleName, refGenome

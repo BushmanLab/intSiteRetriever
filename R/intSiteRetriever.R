@@ -4,8 +4,10 @@
     inner_join(sites, sample_ref_in_db)
 }
 
-#' for a given sample names get sites.
-#' @param setName vector of sample names
+#' for a given samples get sites positions.
+#' @param sample_ref dataframe with 2 cols: sampleName, refGenome
+#' @param conn connection to database
+#' @return sites dataframe with cols: siteID, chr, strand, position, sampleName, refGenome
 #' @export
 getUniqueSites <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
@@ -22,10 +24,8 @@ getUniqueSites <- function(sample_ref, conn) {
 }
 
 #' lengths distributions for multihits
-#'
-#' @param sampleName vector of sample names
-#' @param conn DB connection
-#' @return df with 3 cols: sampleName, refGenome, multihitID, length
+#' @inheritParams getUniqueSites
+#' @return df with cols: sampleName, refGenome, multihitID, length
 #' @export
 getMultihitLengths <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
@@ -42,9 +42,7 @@ getMultihitLengths <- function(sample_ref, conn) {
 }
 
 #' breakpoints
-#'
-#' @param sample_ref df with 2 cols: sampleName and refGenome
-#' @param conn DB connection
+#' @inheritParams getUniqueSites
 #' @export
 getUniquePCRbreaks <- function(sample_ref, conn) {
     breakpoints <- .get_breakpoints(sample_ref, conn)
@@ -69,11 +67,9 @@ getUniquePCRbreaks <- function(sample_ref, conn) {
     inner_join(samples_in_db, sample_ref, by=c('sampleName', 'refGenome'), copy=TRUE)
 }
 
-#' do we have sample names for a given connection
-#'
-#' @param sample_ref: df with 2 cols: sampleName, refGenome
-#' @param conn DB connection
-#' @return vector of TRUE/FALSE 
+#' do we have samples in database
+#' @inheritParams getUniqueSites
+#' @return vector of TRUE/FALSE for each row in sample_ref df
 #' @export
 setNameExists <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
@@ -88,9 +84,7 @@ setNameExists <- function(sample_ref, conn) {
 }
 
 #' counts
-#'
-#' @param setName vector of sample names
-#' @param conn DB connection
+#' @inheritParams getUniqueSites
 #' @export
 getUniqueSiteReadCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
@@ -101,9 +95,7 @@ getUniqueSiteReadCounts <- function(sample_ref, conn) {
 }
 
 #' unique counts for integration sites for a given sample(with fixed genome)
-#'
-#' @param sample_ref df with 2 cols: sampleName, refGenome
-#' @param conn DB connection
+#' @inheritParams getUniqueSites
 #' @export
 getUniqueSiteCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
@@ -114,13 +106,10 @@ getUniqueSiteCounts <- function(sample_ref, conn) {
 
 
 #' creates match random controls.
-#'
-#' @param sampe_ref  df with 2 cols: sampleName, refGenome 
+#' @inheritParams getUniqueSites
 #' @param numberOfMRCs how many controls for each site
-#' @param DB connection
 #' @return df with cols: siteID, position, strand, chr, sampleName, refGenome
 #' @export
-#'
 getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sites <- .get_unique_sites(sample_ref, conn) 

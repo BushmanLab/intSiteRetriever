@@ -7,9 +7,9 @@
 getUniqueSiteCounts(sample_ref, conn)
 }
 \arguments{
-\item{sample_ref}{df with 2 cols: sampleName, refGenome}
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
 
-\item{conn}{DB connection}
+\item{conn}{connection to database}
 }
 \description{
 unique counts for integration sites for a given sample(with fixed genome)

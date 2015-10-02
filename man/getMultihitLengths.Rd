@@ -7,12 +7,12 @@
 getMultihitLengths(sample_ref, conn)
 }
 \arguments{
-\item{conn}{DB connection}
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
 
-\item{sampleName}{vector of sample names}
+\item{conn}{connection to database}
 }
 \value{
-df with 3 cols: sampleName, refGenome, multihitID, length
+df with cols: sampleName, refGenome, multihitID, length
 }
 \description{
 lengths distributions for multihits

@@ -2,14 +2,19 @@
 % Please edit documentation in R/intSiteRetriever.R
 \name{getUniqueSites}
 \alias{getUniqueSites}
-\title{for a given sample names get sites.}
+\title{for a given samples get sites positions.}
 \usage{
 getUniqueSites(sample_ref, conn)
 }
 \arguments{
-\item{setName}{vector of sample names}
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
+
+\item{conn}{connection to database}
+}
+\value{
+sites dataframe with cols: siteID, chr, strand, position, sampleName, refGenome
 }
 \description{
-for a given sample names get sites.
+for a given samples get sites positions.
 }
 

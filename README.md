@@ -2,52 +2,84 @@
 
 [![codecov.io](http://codecov.io/github/BushmanLab/intSiteRetriever/coverage.svg?branch=master)](http://codecov.io/github/BushmanLab/intSiteRetriever?branch=master)
 
-# Get integration sites from Database or from Rdata files
+# Get integration sites from Database
 
 For a given sample name gets integration site and matched random controls(MRCs).
 
+# Installation
 
-
-# Interface
-
-At present we provide functions that work by loading data from database
-or from RData files produced by intSiteCaller.
-
-We need to create connection for both cases. 
-If we have RData files and sampleInfo.tsv connection can be established by:
-
-```r
-sites_final_path <- Sys.glob("../../data/*/sites.final.RData")
-sampleInfo_path <- "../../data/sampleInfo.tsv"
-
-connection <- create_connection_from_files(
-    sampleInfo_path, sites_final_path)
+From the R terminal  or RStudio console run:
+```
+devtools::install_github("BushmanLab/intSiteRetriever")
 ```
 
-After connection is established we can get sites by:
-
-```r
-getUniqueSites(c("pool1-1", "clone1-1"), connection)
+If source is required, first get source from github(from bash):
+```
+git clone https://github.com/BushmanLab/intSiteRetriever.git
+```
+and from R terminal:
+```{r}
+devtools::document()
+devtools::install()
+library(intSiteRetriever)
 ```
 
-Functions:
+# Connection to Database
 
-* getUniqueSites
-* getMRCs
+For MySQL database config file should be in home directory and called .my.cnf.
+
+.my.cnf file format is:
+```
+[GROUP_NAME]
+user=YYYYYYY
+password=XXXXXX
+host=microbYYYY.med.upenn.edu
+port=3309
+database=intsites_miseq
+```
+
+We can establish connection in R:
+```{r}
+dbConn <- dbConnect(MySQL(), group='GROUP_NAME')
+info <- dbGetInfo(dbConn)
+dbConn <- src_sql("mysql", dbConn, info = info)
+```
+The group should be the same as group in `.my.cnf` file.
+Note that by default connection will expire in about 5 minutes for MySQL.
+
+#Interface
+
+After connection is established we can get sites:
+
+```{r}
+sample_ref <- data_frame(
+    sampleName=c("sample1", "sample2"),
+    refGenome=c("hg18", "hg18")
+)
+sites <- getUniqueSites(sample_ref, dbConn)
+```
+
+Public functions are:
+
 * setNameExists
-* getReferenceGenome
+* getUniqueSites
+* getUniqueSiteCounts
+* getUniqueSiteReadCounts
+* getUniquePCRbreaks
+* getMultihitLengths
+* getMRCs
+* get_N_MRCs
+* get_random_positions
+* get_reference_genome
 
-## Generation of random positions on genome
+Documentation for functions:
+```{r}
+?getUniqueSites
+```
 
-* get_reference_genome finds genome object for UCSC name
-* get_random_positions generate gender-specific positions for a genome
-* get_N_MRCs generate MRCs for sites that are not in DB
-
-#Depandencies
-
+#Dependencies
 
 Dependencies can be loaded with:
-
 ```
 library(GenomicRanges)
 library(BSgenome)
@@ -55,40 +87,18 @@ library(RMySQL)
 library(dplyr)
 ```
 
-
 # Testing of the library components
 
 Run in the R console:
-
 ```bash
 library(devtools)
 devtools::test()
 ```
 
-Database schema is from file `intsitesdev.sqlite`.
+# Schema
 
+Database schema is from file `integration_site_schema.sql`.
 
-# Installation
+# Continuous Integration 
 
-From the R terminal run:
-```
-devtools::install_github("BushmanLab/intSiteRetriever")
-```
-
-If source is required, first get source from github, from bash:
-
-```
-git clone https://github.com/BushmanLab/intSiteRetriever.git
-```
-
-and from R terminal:
-
-```
-devtools::document()
-devtools::install()
-library(intSiteRetriever)
-```
-
-After that public API can be accessed.
-
-# continuous integration 
+Travis is used for testing on each commit and Codecov used for code coverage metrics.

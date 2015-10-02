@@ -7,9 +7,9 @@
 getUniqueSiteReadCounts(sample_ref, conn)
 }
 \arguments{
-\item{conn}{DB connection}
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
 
-\item{setName}{vector of sample names}
+\item{conn}{connection to database}
 }
 \description{
 counts

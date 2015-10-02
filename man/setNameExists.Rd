@@ -2,19 +2,19 @@
 % Please edit documentation in R/intSiteRetriever.R
 \name{setNameExists}
 \alias{setNameExists}
-\title{do we have sample names for a given connection}
+\title{do we have samples in database}
 \usage{
 setNameExists(sample_ref, conn)
 }
 \arguments{
-\item{conn}{DB connection}
+\item{sample_ref}{dataframe with 2 cols: sampleName, refGenome}
 
-\item{sample_ref:}{df with 2 cols: sampleName, refGenome}
+\item{conn}{connection to database}
 }
 \value{
-vector of TRUE/FALSE
+vector of TRUE/FALSE for each row in sample_ref df
 }
 \description{
-do we have sample names for a given connection
+do we have samples in database
 }
 
