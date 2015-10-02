@@ -7,7 +7,7 @@
 getUniqueSiteReadCounts(sample_ref, conn)
 }
 \arguments{
-\item{conn}{connection: DB or File connection}
+\item{conn}{DB connection}
 
 \item{setName}{vector of sample names}
 }

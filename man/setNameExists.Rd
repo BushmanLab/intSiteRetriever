@@ -7,7 +7,7 @@
 setNameExists(sample_ref, conn)
 }
 \arguments{
-\item{conn}{connection: DB or File connection}
+\item{conn}{DB connection}
 
 \item{sample_ref:}{df with 2 cols: sampleName, refGenome}
 }

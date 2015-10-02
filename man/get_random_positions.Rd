@@ -19,7 +19,8 @@ get_random_positions(siteIDs, reference_genome, gender,
 \item{male_chr}{list of male-specific chromosomes prefixes(only 1 prefix is allowed at present)}
 }
 \value{
-dataframe with columns: siteID, chr, strand, position
+dataframe with columns:
+     siteID(numeric), chr(character), strand(character), position(numeric)
 }
 \description{
 for a given reference genome and gender generate random positions

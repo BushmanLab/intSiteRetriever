@@ -11,7 +11,7 @@ getMRCs(sample_ref, conn, numberOfMRCs = 3)
 
 \item{sampe_ref}{df with 2 cols: sampleName, refGenome}
 
-\item{connection:}{DB or File connection}
+\item{DB}{connection}
 }
 \value{
 df with cols: siteID, position, strand, chr, sampleName, refGenome

@@ -7,7 +7,7 @@
 getMultihitLengths(sample_ref, conn)
 }
 \arguments{
-\item{conn}{connection: DB or File connection}
+\item{conn}{DB connection}
 
 \item{sampleName}{vector of sample names}
 }
