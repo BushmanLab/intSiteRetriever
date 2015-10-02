@@ -95,8 +95,8 @@ get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3, mal
     plyr::unrowname(do.call(rbind, mrcs))
 }
 
-#' from vector of chromosome lengths with names creates vector for male or female
-#' @param all_chromosomes vector with length, names(all_chromosomes) are actual names of chromosome
+# from vector of chromosome lengths with names creates vector for male or female
+# @param all_chromosomes vector with length, names(all_chromosomes) are actual names of chromosome
 .get_gender_specific_chr <- function(all_chromosomes, gender, male_chr) {
     stopifnot( ! is.null(names(all_chromosomes)))
     stopifnot(length(male_chr) == 1)
@@ -109,7 +109,7 @@ get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3, mal
     female_chromosomes
 }
 
-#' gender can only be male('m') or female('f')
+# gender can only be male('m') or female('f')
 .check_gender <- function(gender) {
     valid <- c('m', 'f')
     values <- unique(gender)
