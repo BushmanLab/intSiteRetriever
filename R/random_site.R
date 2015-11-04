@@ -37,7 +37,7 @@ get_reference_genome <- function(reference_genome) {
 #' @return dataframe with columns: 
 #'      siteID(numeric), chr(character), strand(character), position(numeric)
 #' @export
-get_random_positions <- function(siteIDs, reference_genome, gender,
+get_random_positions <- function(siteIDs, reference_genome, gender='m',
                                  number_of_positions=3, male_chr=c("chrY")){
   stopifnot(length(male_chr) == 1)
   stopifnot(length(gender) == 1)
