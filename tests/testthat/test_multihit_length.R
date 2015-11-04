@@ -68,8 +68,8 @@ test_that("values are correct for sample1", {
     expected <- data.frame(
         sampleName=c("sample1", "sample1", "sample1", "sample1"),
         refGenome=c("hg18", "hg18", "hg18", "hg18"),
-        multihitID=c(1, 1, 2, 2),
-        length=c(100, 120, 100, 300),
+        multihitID=c(1L, 1L, 2L, 2L),
+        length=c(100L, 120L, 100L, 300L),
         stringsAsFactors=FALSE
     )
     expect_equivalent(filter(result, sampleName =="sample1", refGenome=="hg18"), expected)
