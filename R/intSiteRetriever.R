@@ -94,7 +94,7 @@ getUniquePCRbreaks <- function(sample_ref, conn) {
 setNameExists <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     
-    sample_ref_in_db <- collect(.get_sample_table(conn))
+    sample_ref_in_db <- collect(.get_sample_table(conn), n = Inf)
     if (nrow(sample_ref_in_db) == 0) { # nothing is in db
         return(rep(FALSE, nrow(sample_ref))) 
     }
