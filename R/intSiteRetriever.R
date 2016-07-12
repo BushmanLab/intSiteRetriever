@@ -30,7 +30,8 @@ getUniqueSites <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sites <- .get_unique_sites(sample_ref, conn)
     collect( select(sites, 
-        siteID, chr, strand, position, sampleName, refGenome)
+        siteID, chr, strand, position, sampleName, refGenome),
+        n = Inf
     )
 }
 
@@ -49,7 +50,8 @@ getMultihitLengths <- function(sample_ref, conn) {
     samples_multihitpositions <- .get_multihitpositions(sample_ref, conn)
     multihit_lengths <- tbl(conn, "multihitlengths")
     collect(distinct(select(inner_join(samples_multihitpositions, multihit_lengths, by="multihitID"),
-        sampleName, refGenome, multihitID, length)))
+        sampleName, refGenome, multihitID, length)),
+        n = Inf)
 }
 
 .get_breakpoints <- function(sample_ref, conn) {
@@ -109,7 +111,7 @@ getUniqueSiteReadCounts <- function(sample_ref, conn) {
     sample_ref_sites_breakpoints <- .get_breakpoints(sample_ref, conn) 
     sample_ref_sites_breakpoints_grouped <- group_by(
         sample_ref_sites_breakpoints, sampleName, refGenome)
-    collect(summarize(sample_ref_sites_breakpoints_grouped, readCount=sum(count)))
+    collect(summarize(sample_ref_sites_breakpoints_grouped, readCount=sum(count)), n = Inf)
 }
 
 #' unique counts for integration sites for a given sample(with fixed genome)
@@ -119,7 +121,7 @@ getUniqueSiteCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sample_ref_sites <- .get_unique_sites(sample_ref, conn)
     sample_ref_sites_grouped <- group_by(sample_ref_sites, sampleName, refGenome)
-    collect(summarize(sample_ref_sites_grouped, uniqueSites=n()))
+    collect(summarize(sample_ref_sites_grouped, uniqueSites=n()), n = Inf)
 }
 
 
@@ -132,7 +134,7 @@ getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sites <- .get_unique_sites(sample_ref, conn) 
     sites.metadata <- collect(select(sites, 
-        siteID, gender, sampleName, refGenome))
+        siteID, gender, sampleName, refGenome), n = Inf)
 
     sites_meta <- data.frame("siteID"=sites.metadata$siteID,
                            "gender"=tolower(sites.metadata$gender))
