@@ -64,7 +64,8 @@ getMultihitLengths <- function(sample_ref, conn) {
 getUniquePCRbreaks <- function(sample_ref, conn) {
     breakpoints <- .get_breakpoints(sample_ref, conn)
     collect(select(breakpoints,
-        breakpoint, count, position, siteID, chr, strand, sampleName, refGenome)
+        breakpoint, count, position, siteID, chr, strand, sampleName, refGenome),
+        n = Inf
     )
 # column named kept as in DB ...sites.position AS integration...
 }
