@@ -59,3 +59,4 @@ test_that("get_N_MRCs return the same result for the same siteIDs", {
     mrcs2 <- get_N_MRCs(sites_meta, reference, 9, male_chr="chrI")
     expect_equal(mrcs1, mrcs2)
 })
+

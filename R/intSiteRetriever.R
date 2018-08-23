@@ -17,8 +17,8 @@
 
 .get_unique_sites <- function(sample_ref, conn) {
     sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
-    sites <- tbl(conn, "sites") 
-    inner_join(sites, sample_ref_in_db)
+    sites <- dplyr::tbl(conn, "sites") 
+    dplyr::inner_join(sites, sample_ref_in_db)
 }
 
 #' for a given samples get sites positions.
@@ -29,16 +29,16 @@
 getUniqueSites <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sites <- .get_unique_sites(sample_ref, conn)
-    collect( select(sites, 
-        siteID, chr, strand, position, sampleName, refGenome),
-        n = Inf
-    )
+    dplyr::collect( 
+        dplyr::select(
+            sites, siteID, chr, strand, position, sampleName, refGenome), 
+        n = Inf)
 }
 
 .get_multihitpositions <- function(sample_ref, conn) {
     sample_ref_in_db <- .get_sample_ref_in_db(sample_ref, conn)
-    multihitpositions <- tbl(conn, "multihitpositions") 
-    inner_join(multihitpositions, sample_ref_in_db, by="sampleID")
+    multihitpositions <- dplyr::tbl(conn, "multihitpositions") 
+    dplyr::inner_join(multihitpositions, sample_ref_in_db, by = "sampleID")
 }
 
 #' lengths distributions for multihits
@@ -48,16 +48,17 @@ getUniqueSites <- function(sample_ref, conn) {
 getMultihitLengths <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     samples_multihitpositions <- .get_multihitpositions(sample_ref, conn)
-    multihit_lengths <- tbl(conn, "multihitlengths")
-    collect(distinct(select(inner_join(samples_multihitpositions, multihit_lengths, by="multihitID"),
-        sampleName, refGenome, multihitID, length)),
+    multihit_lengths <- dplyr::tbl(conn, "multihitlengths")
+    dplyr::collect(dplyr::distinct(dplyr::select(dplyr::inner_join(
+                samples_multihitpositions, multihit_lengths, by = "multihitID"),
+            sampleName, refGenome, multihitID, length)),
         n = Inf)
 }
 
 .get_breakpoints <- function(sample_ref, conn) {
     sample_ref_sites <- .get_unique_sites(sample_ref, conn)
-    breakpoints <- tbl(conn, "pcrbreakpoints") 
-    inner_join(sample_ref_sites, breakpoints) 
+    breakpoints <- dplyr::tbl(conn, "pcrbreakpoints") 
+    dplyr::inner_join(sample_ref_sites, breakpoints) 
 }
 
 #' breakpoints
@@ -65,26 +66,30 @@ getMultihitLengths <- function(sample_ref, conn) {
 #' @export
 getUniquePCRbreaks <- function(sample_ref, conn) {
     breakpoints <- .get_breakpoints(sample_ref, conn)
-    collect(select(breakpoints,
-        breakpoint, count, position, siteID, chr, strand, sampleName, refGenome),
+    dplyr::collect(dplyr::select(breakpoints,
+            breakpoint, count, position, siteID, chr, 
+            strand, sampleName, refGenome),
         n = Inf
     )
 # column named kept as in DB ...sites.position AS integration...
 }
 
 .check_has_sample_ref_cols <- function(sample_ref) {
-    return (all(c("sampleName", "refGenome") %in% names(sample_ref)))
+    return(all(c("sampleName", "refGenome") %in% names(sample_ref)))
 }
 
 .get_sample_table <- function(conn) {
-    samples_in_db <- tbl(conn, "samples") 
-    select(samples_in_db, sampleID, sampleName, refGenome)
+    samples_in_db <- dplyr::tbl(conn, "samples") 
+    dplyr::select(samples_in_db, sampleID, sampleName, refGenome)
 }
 
 .get_sample_ref_in_db <- function(sample_ref, conn) {
-    samples_in_db <- tbl(conn, "samples") 
-    samples_in_db <- select(samples_in_db, sampleID, sampleName, refGenome, gender)
-    inner_join(samples_in_db, sample_ref, by=c('sampleName', 'refGenome'), copy=TRUE)
+    samples_in_db <- dplyr::tbl(conn, "samples") 
+    samples_in_db <- dplyr::select(
+        samples_in_db, sampleID, sampleName, refGenome, gender)
+    dplyr::inner_join(
+        samples_in_db, sample_ref, 
+        by = c('sampleName', 'refGenome'), copy = TRUE)
 }
 
 #' do we have samples in database
@@ -94,7 +99,7 @@ getUniquePCRbreaks <- function(sample_ref, conn) {
 setNameExists <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     
-    sample_ref_in_db <- collect(.get_sample_table(conn), n = Inf)
+    sample_ref_in_db <- dplyr::collect(.get_sample_table(conn), n = Inf)
     if (nrow(sample_ref_in_db) == 0) { # nothing is in db
         return(rep(FALSE, nrow(sample_ref))) 
     }
@@ -109,9 +114,11 @@ setNameExists <- function(sample_ref, conn) {
 getUniqueSiteReadCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sample_ref_sites_breakpoints <- .get_breakpoints(sample_ref, conn) 
-    sample_ref_sites_breakpoints_grouped <- group_by(
+    sample_ref_sites_breakpoints_grouped <- dplyr::group_by(
         sample_ref_sites_breakpoints, sampleName, refGenome)
-    collect(summarize(sample_ref_sites_breakpoints_grouped, readCount=sum(count)), n = Inf)
+    dplyr::collect(dplyr::summarize(
+            sample_ref_sites_breakpoints_grouped, readCount = sum(count)), 
+        n = Inf)
 }
 
 #' unique counts for integration sites for a given sample(with fixed genome)
@@ -120,8 +127,10 @@ getUniqueSiteReadCounts <- function(sample_ref, conn) {
 getUniqueSiteCounts <- function(sample_ref, conn) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sample_ref_sites <- .get_unique_sites(sample_ref, conn)
-    sample_ref_sites_grouped <- group_by(sample_ref_sites, sampleName, refGenome)
-    collect(summarize(sample_ref_sites_grouped, uniqueSites=n()), n = Inf)
+    sample_ref_sites_grouped <- dplyr::group_by(
+        sample_ref_sites, sampleName, refGenome)
+    dplyr::collect(dplyr::summarize(
+        sample_ref_sites_grouped, uniqueSites = n()), n = Inf)
 }
 
 
@@ -133,16 +142,18 @@ getUniqueSiteCounts <- function(sample_ref, conn) {
 getMRCs <- function(sample_ref, conn, numberOfMRCs=3) {
     stopifnot(.check_has_sample_ref_cols(sample_ref))
     sites <- .get_unique_sites(sample_ref, conn) 
-    sites.metadata <- collect(select(sites, 
-        siteID, gender, sampleName, refGenome), n = Inf)
+    sites.metadata <- dplyr::collect(dplyr::select(
+        sites, siteID, gender, sampleName, refGenome), n = Inf)
 
-    sites_meta <- data.frame("siteID"=sites.metadata$siteID,
-                           "gender"=tolower(sites.metadata$gender))
+    sites_meta <- data.frame(
+        "siteID" = sites.metadata$siteID,
+        "gender" = tolower(sites.metadata$gender))
 
     stopifnot(length(unique(sites.metadata$refGenome)) == 1)
     ref_genome <- sites.metadata$refGenome[1] # all the same
   
-    mrcs <- get_N_MRCs(sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
+    mrcs <- get_N_MRCs(
+        sites_meta, get_reference_genome(ref_genome), numberOfMRCs)
   
     merge(mrcs, sites.metadata[c("siteID", "sampleName", "refGenome")])
 }

@@ -33,13 +33,13 @@ get_reference_genome <- function(reference_genome) {
             call. = FALSE)
     }
     pattern <- paste0("\\.", reference_genome, "$")
-    match_index <- which(grepl(pattern, installed.genomes()))
+    match_index <- which(grepl(pattern, unique(BSgenome::installed.genomes())))
     if (length(match_index) != 1) {
         write("Installed genomes are:", stderr())
-        write(installed.genomes(), stderr())
+        write(BSgenome::installed.genomes(), stderr())
         stop(paste("Cannot find unique genome for", reference_genome))
     }
-    BS_genome_full_name <- installed.genomes()[match_index]
+    BS_genome_full_name <- unique(BSgenome::installed.genomes())[match_index]
     library(BS_genome_full_name, character.only=T)
     get(BS_genome_full_name)
 }
@@ -65,7 +65,7 @@ get_random_positions <- function(siteIDs, reference_genome, gender='m',
   chr_len <- .get_gender_specific_chr(chr_len, gender, male_chr)
   chr_len <- chr_len[names(chr_len) != "chrM"] #remove mitochondria
 
-  cs <- c(0,cumsum(as.numeric(chr_len)))
+  cs <- c(0, cumsum(as.numeric(chr_len)))
   genomeLength <- max(cs)
 
   seed <- .Random.seed #don't want to screw up global randomness
@@ -76,10 +76,12 @@ get_random_positions <- function(siteIDs, reference_genome, gender='m',
     cuts <- cut(abs(rands), breaks=cs, labels=names(chr_len))
 
     #outputs in format of "siteID", "chr", "strand", "position"
-    data_frame(
+    dplyr::data_frame(
         "siteID" = rep(x,number_of_positions),
         "chr" = as.character(cuts),
-        "strand" = as.character(cut(sign(rands), breaks=c(-1,0,1), labels=c("-", "+"), include.lowest=T)),
+        "strand" = as.character(cut(
+            sign(rands), breaks=c(-1,0,1), 
+            labels=c("-", "+"), include.lowest=T)),
         "position" = abs(rands) - cs[match(cuts, names(chr_len))])
   })
 
@@ -97,7 +99,8 @@ get_random_positions <- function(siteIDs, reference_genome, gender='m',
 #'
 #' @note siteID are the same as given by sites_meta df
 #' @export
-get_N_MRCs <- function(sites_meta, reference_genome, number_mrcs_per_site=3, male_chr="chrY") {
+get_N_MRCs <- function(sites_meta, reference_genome, 
+                       number_mrcs_per_site=3, male_chr="chrY") {
     stopifnot(setequal(names(sites_meta), c("siteID", "gender")))
     stopifnot(number_mrcs_per_site > 0)
     stopifnot(.check_gender(sites_meta$gender))

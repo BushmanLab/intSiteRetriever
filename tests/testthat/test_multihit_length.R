@@ -1,11 +1,11 @@
 source("database.R") # provide db_name
 
-read_conn <- src_sqlite(db_name)
+read_conn <- dplyr::src_sqlite(db_name)
 
 context("setNameExists")
 
 test_that("can find sample that is in db", {
-    sample_ref <- data_frame(
+    sample_ref <- dplyr::data_frame(
         sampleName=c("sample1"),
         refGenome=c("hg18")
     )
@@ -13,7 +13,7 @@ test_that("can find sample that is in db", {
 })
 
 test_that("can NOT find sample that is NOT in db", {
-    sample_ref <- data_frame(
+    sample_ref <- dplyr::data_frame(
         sampleName=c("sample1_NOT_THERE"),
         refGenome=c("hg18")
     )
@@ -21,7 +21,7 @@ test_that("can NOT find sample that is NOT in db", {
 })
 
 test_that("can present/absent samples", {
-    sample_ref <- data_frame(
+    sample_ref <- dplyr::data_frame(
         sampleName=c("sample3", "sample1_NOT_THERE"),
         refGenome=c("hgYYY", "hg18")
     )
@@ -29,7 +29,7 @@ test_that("can present/absent samples", {
 })
 
 test_that("the same sample but different genomes", {
-    sample_ref <- data_frame(
+    sample_ref <- dplyr::data_frame(
         sampleName=c("sample2", "sample2", "sample2"),
         refGenome=c("hg18", "hgXXX", "NOT_IN_DB")
     )
@@ -38,7 +38,7 @@ test_that("the same sample but different genomes", {
 
 context("check multihit length")
 
-samples <- data_frame(
+samples <- dplyr::data_frame(
     sampleName=c("sample1", "sample2"),
     refGenome=c("hg18", "hg18")
 )
@@ -80,6 +80,6 @@ test_that("has 1 lengths for sample2", {
 })
 
 test_that("return nothing for non-existing sample", {
-    expect_equal(nrow(getMultihitLengths(data_frame(sampleName="it does not exist",
+    expect_equal(nrow(getMultihitLengths(dplyr::data_frame(sampleName="it does not exist",
         refGenome="hg18"), read_conn)), 0)
 })
