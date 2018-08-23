@@ -1,16 +1,16 @@
 source("database.R") # provide db_name
 
-read_conn <- src_sqlite(db_name)
+read_conn <- dplyr::src_sqlite(db_name)
 
 context("Unique sites counts")
 
-sample_ref <- data_frame(
+sample_ref <- dplyr::data_frame(
     sampleName=c("sample1", "sample2", "sample2", "sample3"),
     refGenome=c("hg18", "hg18", "hgXXX", "hgYYY")
 )
 
 test_that("for samples not in db return nothing", {
-    sample_ref <- data_frame(
+    sample_ref <- dplyr::data_frame(
         sampleName=c("NOT_IN_DB_sample1", "NOT_IN_DB_sample2"),
         refGenome=c("NOT_IN_DB_hg18", "NOT_IN_DB_hg18")
     )

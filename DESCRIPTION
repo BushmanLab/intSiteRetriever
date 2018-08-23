@@ -10,3 +10,4 @@ Suggests:
     testthat, BSgenome.Scerevisiae.UCSC.sacCer2, RSQLite
 Imports:
     dplyr, plyr, BSgenome, RMySQL, GenomicRanges, GenomeInfoDb
+RoxygenNote: 6.0.1.9000
